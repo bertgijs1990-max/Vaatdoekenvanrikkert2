@@ -1,0 +1,2888 @@
+<!DOCTYPE html>
+<html lang="nl" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOORDWEEF® | Specialist in 70×70 cm Handdoeken & Vaatdoeken</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        alabaster: {
+                            50: '#FAF8F5',
+                            100: '#F3EFE8',
+                            200: '#E6DFD3',
+                            300: '#D4C8B5',
+                        },
+                        forest: {
+                            50: '#F2F6F4',
+                            100: '#E1ECE6',
+                            500: '#3B6051',
+                            600: '#2D4A3E',
+                            700: '#233A31',
+                            800: '#192B24',
+                        },
+                        ink: {
+                            800: '#27272A',
+                            900: '#18181B',
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        body {
+            background-color: #FAF8F5;
+            color: #18181B;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FAF8F5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D4C8B5;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #2D4A3E;
+        }
+        canvas.loupe-enabled {
+            cursor: crosshair;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-invoice-sheet, #printable-invoice-sheet * {
+                visibility: visible;
+            }
+            #printable-invoice-sheet {
+                position: absolute;
+                inset: 0;
+                background: white;
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-forest-600 selection:text-white">
+
+    <!-- Minimal HTML Shell: 100% rendered and controlled by Vanilla ES6+ JavaScript -->
+    <div id="app"></div>
+
+    <script>
+        'use strict';
+
+        /* ============================================================================
+         * 1. EASY-TO-EDIT CATALOG DATA & CONSTANTS (PRODUCTS, SWATCHES, TIERS)
+         * ============================================================================ */
+        const SWATCHES = {
+            saliegroen:  { key: 'saliegroen',  name: 'Saliegroen',  hex: '#566F61' },
+            antraciet:   { key: 'antraciet',   name: 'Antraciet',   hex: '#2B2D2F' },
+            zandbeige:   { key: 'zandbeige',   name: 'Zandbeige',   hex: '#DACFC0' },
+            oceaanblauw: { key: 'oceaanblauw', name: 'Oceaanblauw', hex: '#284157' },
+            krijtwit:    { key: 'krijtwit',    name: 'Krijtwit',    hex: '#F2EFE9' },
+            terracotta:  { key: 'terracotta',  name: 'Terracotta',  hex: '#A85D44' }
+        };
+
+        const WEAVE_META = {
+            waffle:     { key: 'waffle',     label: '3D Wafelkatoen',             wash: '60°C–90°C' },
+            terry:      { key: 'terry',      label: 'Hotel Badstof Lusweefsel',   wash: 'Kookwas 90°C' },
+            linen:      { key: 'linen',      label: 'Kepergeweven Halflinnen',    wash: 'Kookwas 95°C' },
+            microfiber: { key: 'microfiber', label: 'Parel-Microvezel',           wash: '60°C–90°C' }
+        };
+
+        const VOLUME_TIERS = [
+            { qty: 1,  label: '1 stuk',              shortLabel: 'Los stuk',   discount: 0.00 },
+            { qty: 6,  label: '6-pack (-10%)',       shortLabel: '6-pack',     discount: 0.10 },
+            { qty: 12, label: '12-pack (-15%)',      shortLabel: '12-pack',    discount: 0.15 },
+            { qty: 24, label: 'Horecadoos 24 (-25%)',shortLabel: '24 stuks',   discount: 0.25 }
+        ];
+
+        const PRODUCTS = [
+            {
+                sku: 'NW-WAF-70',
+                name: 'Noordweef Royale Wafelhanddoek XL',
+                category: 'handdoeken-70x70',
+                dimensions: '70×70 cm',
+                gsm: 480,
+                weave: 'waffle',
+                basePriceIncl: 10.95,
+                colors: ['saliegroen', 'antraciet', 'zandbeige', 'oceaanblauw', 'krijtwit', 'terracotta'],
+                stock: 340,
+                rating: 4.9,
+                reviews: 428,
+                popularity: 100,
+                badge: 'Meest Gekozen',
+                description: 'Extra grote vierkante keukendoek/handdoek van 70×70 cm (4.900 cm²). De diepe 3D-honingraatstructuur neemt razendsnel vocht op, droogt luchtig aan de verstevigde katoenen ophanglus en blijft 100% pluisvrij.'
+            },
+            {
+                sku: 'NW-TER-70',
+                name: 'Hotel-Kwaliteit Badstof Handdoek XL',
+                category: 'handdoeken-70x70',
+                dimensions: '70×70 cm',
+                gsm: 550,
+                weave: 'terry',
+                basePriceIncl: 11.95,
+                colors: ['antraciet', 'zandbeige', 'saliegroen', 'krijtwit', 'oceaanblauw'],
+                stock: 215,
+                rating: 4.9,
+                reviews: 312,
+                popularity: 95,
+                badge: 'Zwaarste 550 g/m²',
+                description: 'Onze volste, zwaarst geweven 70×70 cm handdoek met dubbele gekamde katoenlussen (550 g/m²). Ideaal voor grote gezinnen, kookeilanden en intensief handen drogen zonder dat de doek klam aanvoelt.'
+            },
+            {
+                sku: 'NW-LIN-70',
+                name: 'Bistro Kepergeweven Halflinnen Doek XL',
+                category: 'handdoeken-70x70',
+                dimensions: '70×70 cm',
+                gsm: 420,
+                weave: 'linen',
+                basePriceIncl: 9.95,
+                colors: ['krijtwit', 'zandbeige', 'antraciet', 'oceaanblauw'],
+                stock: 480,
+                rating: 4.8,
+                reviews: 194,
+                popularity: 84,
+                badge: 'Horeca Favoriet',
+                description: 'Klassieke Europese sommelier- en keukendoek (55% vlaslinnen / 45% langstapelig katoen) in royaal 70×70 cm formaat. Poleert kristalglas, bestek en pannen volledig streeploos.'
+            },
+            {
+                sku: 'NW-BIO-70',
+                name: 'GOTS Biologische Wafel-Keukendoek XL',
+                category: 'handdoeken-70x70',
+                dimensions: '70×70 cm',
+                gsm: 500,
+                weave: 'waffle',
+                basePriceIncl: 12.50,
+                colors: ['zandbeige', 'saliegroen', 'terracotta', 'krijtwit'],
+                stock: 160,
+                rating: 5.0,
+                reviews: 119,
+                popularity: 80,
+                badge: '100% Bio GOTS',
+                description: 'Duurzaam en ongebleekt GOTS-gecertificeerd biologisch katoen in 70×70 cm. Voorgekrompen in ons atelier en voorzien van dubbel gestikte zoom en viervoudig verankerde ophanglus.'
+            },
+            {
+                sku: 'NW-MIC-35',
+                name: 'Pro-Parel Microvezel Vaatdoek',
+                category: 'vaatdoeken',
+                dimensions: '35×35 cm',
+                gsm: 380,
+                weave: 'microfiber',
+                basePriceIncl: 3.95,
+                colors: ['antraciet', 'saliegroen', 'zandbeige', 'oceaanblauw', 'terracotta'],
+                stock: 620,
+                rating: 4.9,
+                reviews: 376,
+                popularity: 92,
+                badge: 'Streeploos Aanrecht',
+                description: 'Vervang felgekleurde wegwerpdoekjes door rust op je aanrecht. Deze 380 g/m² parel-geweven vaatdoek verwijdert vet en vingerafdrukken op matzwarte keukens en natuursteen met enkel water.'
+            },
+            {
+                sku: 'NW-KVA-35',
+                name: '100% Katoenen Wafel-Vaatdoek',
+                category: 'vaatdoeken',
+                dimensions: '35×35 cm',
+                gsm: 440,
+                weave: 'waffle',
+                basePriceIncl: 4.25,
+                colors: ['saliegroen', 'zandbeige', 'antraciet', 'krijtwit', 'terracotta'],
+                stock: 410,
+                rating: 4.8,
+                reviews: 205,
+                popularity: 86,
+                badge: '100% Plasticvrij',
+                description: 'Volledig natuurlijke, microplasticvrije vaatdoek van 440 g/m² gekamd wafelkatoen. Kookwasvast tot 90°C zodat bacteriën en geurtjes geen enkele kans krijgen.'
+            },
+            {
+                sku: 'NW-TER-35',
+                name: 'Zware Badstof Werk- & Vaatdoek',
+                category: 'vaatdoeken',
+                dimensions: '35×35 cm',
+                gsm: 490,
+                weave: 'terry',
+                basePriceIncl: 4.50,
+                colors: ['antraciet', 'oceaanblauw', 'saliegroen', 'krijtwit'],
+                stock: 290,
+                rating: 4.8,
+                reviews: 142,
+                popularity: 76,
+                badge: 'Barista & Keuken',
+                description: 'Dikke 35×35 cm badstof vaatdoek, geliefd bij thuisbarista’s en koks voor het schoonhouden van espressomachines, RVS werkbanken en inductiekookplaten.'
+            },
+            {
+                sku: 'NW-SET-10',
+                name: 'Complete Matchset: 4× Handdoek 70×70 + 6× Vaatdoek',
+                category: 'bundels',
+                dimensions: '70×70 & 35×35 cm',
+                gsm: 480,
+                weave: 'waffle',
+                basePriceIncl: 54.95,
+                compareAtIncl: 67.50,
+                isPrebuiltBundle: true,
+                colors: ['saliegroen', 'antraciet', 'zandbeige', 'oceaanblauw', 'terracotta'],
+                stock: 125,
+                rating: 5.0,
+                reviews: 289,
+                popularity: 98,
+                badge: 'Voordeelbundel -19%',
+                description: 'Direct één harmonieuze tint in jouw keuken: 4× Royale Wafelhanddoek (70×70 cm) gecombineerd met 6× kleur-identieke vaatdoeken (35×35 cm) in luxe kraft-geschenkbanderol.'
+            }
+        ];
+
+        const CatalogData = {
+            getAll: () => PRODUCTS,
+            getBySku: (sku) => PRODUCTS.find(p => p.sku === sku),
+            getSwatch: (key) => SWATCHES[key] || SWATCHES.saliegroen,
+            getWeave: (key) => WEAVE_META[key] || WEAVE_META.waffle,
+            getDiscountForUnits: (units, isBundle = false) => {
+                if (isBundle) {
+                    if (units >= 4) return 0.15;
+                    if (units >= 2) return 0.10;
+                    return 0;
+                }
+                if (units >= 24) return 0.25;
+                if (units >= 12) return 0.15;
+                if (units >= 6)  return 0.10;
+                return 0;
+            },
+            getNextTierHint: (units, isBundle = false) => {
+                if (isBundle) return null;
+                if (units < 6)  return { needed: 6 - units,  pct: 10 };
+                if (units < 12) return { needed: 12 - units, pct: 15 };
+                if (units < 24) return { needed: 24 - units, pct: 25 };
+                return null;
+            }
+        };
+
+        /* ============================================================================
+         * 2. PROCEDURAL HTML5 <CANVAS> TEXTILE MACRO-TEXTURE ENGINE
+         * ============================================================================ */
+        class TextileCanvasRenderer {
+            static hexToRgb(hex) {
+                const clean = hex.replace('#', '');
+                const num = parseInt(clean, 16);
+                return {
+                    r: (num >> 16) & 255,
+                    g: (num >> 8) & 255,
+                    b: num & 255
+                };
+            }
+
+            static adjustRgb({ r, g, b }, delta) {
+                const clamp = (v) => Math.max(0, Math.min(255, Math.round(v)));
+                return `rgb(${clamp(r + delta)}, ${clamp(g + delta)}, ${clamp(b + delta)})`;
+            }
+
+            static getLuminance(hex) {
+                const { r, g, b } = this.hexToRgb(hex);
+                return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+            }
+
+            /**
+             * Creates an offscreen seamless pattern tile for the given weave + color + scale
+             */
+            static createWeavePattern(ctx, weave, hex, zoom = 1) {
+                const rgb = this.hexToRgb(hex);
+                const tile = document.createElement('canvas');
+                const tCtx = tile.getContext('2d');
+
+                if (weave === 'waffle') {
+                    const size = Math.max(10, Math.round(16 * zoom));
+                    tile.width = size;
+                    tile.height = size;
+
+                    // Base thread bed
+                    tCtx.fillStyle = this.adjustRgb(rgb, 0);
+                    tCtx.fillRect(0, 0, size, size);
+
+                    // Deep recessed honeycomb pocket
+                    const inset = Math.max(2, Math.round(size * 0.22));
+                    tCtx.fillStyle = this.adjustRgb(rgb, -34);
+                    tCtx.fillRect(inset, inset, size - inset * 2, size - inset * 2);
+
+                    // Inner shadow bevel top/left
+                    tCtx.fillStyle = this.adjustRgb(rgb, -52);
+                    tCtx.fillRect(inset, inset, size - inset * 2, Math.max(1, Math.round(2 * zoom)));
+                    tCtx.fillRect(inset, inset, Math.max(1, Math.round(2 * zoom)), size - inset * 2);
+
+                    // Raised ridge highlight top/left
+                    tCtx.fillStyle = this.adjustRgb(rgb, 26);
+                    tCtx.fillRect(0, 0, size, Math.max(1, Math.round(2.2 * zoom)));
+                    tCtx.fillRect(0, 0, Math.max(1, Math.round(2.2 * zoom)), size);
+
+                    // Subtle cross-yarn ribs on high zoom
+                    if (zoom > 1.4) {
+                        tCtx.strokeStyle = this.adjustRgb(rgb, 14);
+                        tCtx.lineWidth = 1;
+                        for (let i = 2; i < size; i += 4) {
+                            tCtx.beginPath();
+                            tCtx.moveTo(i, 0);
+                            tCtx.lineTo(i, inset);
+                            tCtx.stroke();
+                        }
+                    }
+                } else if (weave === 'terry') {
+                    const size = Math.max(12, Math.round(18 * zoom));
+                    tile.width = size;
+                    tile.height = size;
+                    tCtx.fillStyle = this.adjustRgb(rgb, -18);
+                    tCtx.fillRect(0, 0, size, size);
+
+                    // Deterministic organic terry loops
+                    const loops = [
+                        [0.2, 0.25, 0.18], [0.55, 0.2, 0.2], [0.85, 0.3, 0.17],
+                        [0.35, 0.6, 0.21], [0.72, 0.65, 0.19], [0.15, 0.82, 0.18],
+                        [0.52, 0.88, 0.17]
+                    ];
+                    loops.forEach(([nx, ny, nr], idx) => {
+                        const cx = nx * size;
+                        const cy = ny * size;
+                        const rad = Math.max(1.4, nr * size * 0.65);
+
+                        // Loop shadow
+                        tCtx.beginPath();
+                        tCtx.arc(cx + 1, cy + 1.2, rad, 0, Math.PI * 2);
+                        tCtx.fillStyle = this.adjustRgb(rgb, -42);
+                        tCtx.fill();
+
+                        // Loop yarn body
+                        tCtx.beginPath();
+                        tCtx.arc(cx, cy, rad, 0, Math.PI * 2);
+                        tCtx.strokeStyle = this.adjustRgb(rgb, idx % 2 === 0 ? 24 : 12);
+                        tCtx.lineWidth = Math.max(1.2, 1.8 * zoom);
+                        tCtx.stroke();
+                    });
+                } else if (weave === 'linen') {
+                    const size = Math.max(10, Math.round(14 * zoom));
+                    tile.width = size;
+                    tile.height = size;
+                    tCtx.fillStyle = this.adjustRgb(rgb, 0);
+                    tCtx.fillRect(0, 0, size, size);
+
+                    // Diagonal twill weave + natural flax slub threads
+                    tCtx.strokeStyle = this.adjustRgb(rgb, -24);
+                    tCtx.lineWidth = Math.max(1, 1.4 * zoom);
+                    tCtx.beginPath();
+                    tCtx.moveTo(0, size);
+                    tCtx.lineTo(size, 0);
+                    tCtx.stroke();
+
+                    tCtx.fillStyle = this.adjustRgb(rgb, 20);
+                    for (let y = 0; y < size; y += Math.max(2, Math.round(3.5 * zoom))) {
+                        tCtx.fillRect(0, y, size * 0.65, Math.max(1, zoom));
+                    }
+                    tCtx.fillStyle = this.adjustRgb(rgb, -16);
+                    for (let x = 0; x < size; x += Math.max(2, Math.round(3.5 * zoom))) {
+                        tCtx.fillRect(x, 0, Math.max(1, zoom), size * 0.65);
+                    }
+                } else {
+                    // Pearl microfiber weave
+                    const size = Math.max(8, Math.round(12 * zoom));
+                    tile.width = size;
+                    tile.height = size;
+                    tCtx.fillStyle = this.adjustRgb(rgb, -8);
+                    tCtx.fillRect(0, 0, size, size);
+
+                    const r = Math.max(1.5, size * 0.26);
+                    tCtx.fillStyle = this.adjustRgb(rgb, 18);
+                    tCtx.beginPath();
+                    tCtx.arc(size * 0.28, size * 0.28, r, 0, Math.PI * 2);
+                    tCtx.arc(size * 0.78, size * 0.78, r, 0, Math.PI * 2);
+                    tCtx.fill();
+
+                    tCtx.fillStyle = this.adjustRgb(rgb, -30);
+                    tCtx.beginPath();
+                    tCtx.arc(size * 0.78, size * 0.28, r * 0.7, 0, Math.PI * 2);
+                    tCtx.arc(size * 0.28, size * 0.78, r * 0.7, 0, Math.PI * 2);
+                    tCtx.fill();
+                }
+
+                return ctx.createPattern(tile, 'repeat');
+            }
+
+            static roundedRect(ctx, x, y, w, h, r) {
+                ctx.beginPath();
+                ctx.moveTo(x + r, y);
+                ctx.arcTo(x + w, y, x + w, y + h, r);
+                ctx.arcTo(x + w, y + h, x, y + h, r);
+                ctx.arcTo(x, y + h, x, y, r);
+                ctx.arcTo(x, y, x + w, y, r);
+                ctx.closePath();
+            }
+
+            /**
+             * Renders the tactile folded textile, double-stitched border, hanging loop,
+             * woven corner label, and optional interactive 2.6x macro-zoom loupe.
+             */
+            static render(canvas, options = {}) {
+                if (!canvas) return;
+                const {
+                    weave = 'waffle',
+                    hex = '#566F61',
+                    dimensions = '70×70 cm',
+                    isDishcloth = false,
+                    isBundle = false,
+                    loupe = null // { x, y } in CSS pixels when active
+                } = options;
+
+                const rect = canvas.getBoundingClientRect();
+                const cssW = rect.width || canvas.width || 320;
+                const cssH = rect.height || canvas.height || 220;
+                const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+                if (canvas.width !== Math.round(cssW * dpr) || canvas.height !== Math.round(cssH * dpr)) {
+                    canvas.width = Math.round(cssW * dpr);
+                    canvas.height = Math.round(cssH * dpr);
+                }
+
+                const ctx = canvas.getContext('2d');
+                ctx.save();
+                ctx.scale(dpr, dpr);
+
+                // Warm studio surface background
+                const bgGrad = ctx.createLinearGradient(0, 0, cssW, cssH);
+                bgGrad.addColorStop(0, '#F5F1E9');
+                bgGrad.addColorStop(1, '#EAE3D6');
+                ctx.fillStyle = bgGrad;
+                ctx.fillRect(0, 0, cssW, cssH);
+
+                const rgb = this.hexToRgb(hex);
+                const isLightFabric = this.getLuminance(hex) > 0.68;
+                const pattern = this.createWeavePattern(ctx, weave, hex, 1);
+
+                // Geometry based on towel vs dishcloth vs bundle
+                const padX = isDishcloth ? cssW * 0.20 : cssW * 0.13;
+                const padY = isDishcloth ? cssH * 0.17 : cssH * 0.13;
+                const mainW = cssW - padX * 2;
+                const mainH = cssH - padY * 2;
+
+                // Soft studio contact shadow
+                ctx.save();
+                ctx.shadowColor = 'rgba(24, 24, 27, 0.22)';
+                ctx.shadowBlur = 22;
+                ctx.shadowOffsetY = 10;
+                this.roundedRect(ctx, padX + 4, padY + 8, mainW - 4, mainH - 4, 14);
+                ctx.fillStyle = this.adjustRgb(rgb, -25);
+                ctx.fill();
+                ctx.restore();
+
+                // Lower folded towel layer (creates stacked folded depth)
+                this.roundedRect(ctx, padX + 6, padY + 10, mainW - 4, mainH - 2, 14);
+                ctx.fillStyle = pattern;
+                ctx.fill();
+                ctx.fillStyle = 'rgba(0,0,0,0.14)';
+                ctx.fill();
+
+                // If bundle: draw secondary accent dishcloth stacked neatly
+                if (isBundle) {
+                    this.roundedRect(ctx, padX + 12, padY + 4, mainW - 16, mainH - 10, 13);
+                    ctx.fillStyle = pattern;
+                    ctx.fill();
+                    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+                    ctx.fill();
+                }
+
+                // Cotton Hanging Loop protruding subtly at top-left
+                if (!isDishcloth) {
+                    ctx.save();
+                    this.roundedRect(ctx, padX + 22, padY - 7, 28, 13, 5);
+                    ctx.fillStyle = '#EFECE6';
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(24,24,27,0.18)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // Top Primary Textile Face
+                const topH = mainH - 10;
+                ctx.save();
+                this.roundedRect(ctx, padX, padY, mainW - 6, topH, 14);
+                ctx.fillStyle = pattern;
+                ctx.fill();
+
+                // Tactile 3D lighting gradient across cloth surface
+                const sheen = ctx.createLinearGradient(padX, padY, padX + mainW, padY + topH);
+                sheen.addColorStop(0, 'rgba(255,255,255,0.14)');
+                sheen.addColorStop(0.5, 'rgba(255,255,255,0.0)');
+                sheen.addColorStop(1, 'rgba(0,0,0,0.16)');
+                ctx.fillStyle = sheen;
+                ctx.fill();
+
+                // Subtle fabric edge border
+                ctx.strokeStyle = isLightFabric ? 'rgba(24,24,27,0.14)' : 'rgba(255,255,255,0.12)';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Double-Stitched Hem Detail around entire perimeter
+                const hemInset = 9;
+                this.roundedRect(
+                    ctx,
+                    padX + hemInset,
+                    padY + hemInset,
+                    mainW - 6 - hemInset * 2,
+                    topH - hemInset * 2,
+                    9
+                );
+                ctx.setLineDash([4, 3]);
+                ctx.strokeStyle = isLightFabric ? 'rgba(24,24,27,0.28)' : 'rgba(255,255,255,0.34)';
+                ctx.lineWidth = 1.15;
+                ctx.stroke();
+                ctx.setLineDash([]);
+                ctx.restore();
+
+                // Woven Jacquard Corner Label ("70×70 CM • NOORDWEEF")
+                const labelText = `${dimensions.toUpperCase()} • NOORDWEEF`;
+                ctx.font = '700 9px "Plus Jakarta Sans", sans-serif';
+                const textW = ctx.measureText(labelText).width;
+                const tagW = textW + 16;
+                const tagH = 20;
+                const tagX = padX + mainW - 6 - tagW - 14;
+                const tagY = padY + topH - tagH - 13;
+
+                ctx.save();
+                ctx.shadowColor = 'rgba(0,0,0,0.16)';
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetY = 1;
+                this.roundedRect(ctx, tagX, tagY, tagW, tagH, 4);
+                ctx.fillStyle = '#FAF8F5';
+                ctx.fill();
+                ctx.restore();
+
+                // Stitch tacks on left/right of woven label
+                ctx.strokeStyle = '#2D4A3E';
+                ctx.lineWidth = 1.4;
+                ctx.beginPath();
+                ctx.moveTo(tagX + 3, tagY + 4);
+                ctx.lineTo(tagX + 3, tagY + tagH - 4);
+                ctx.moveTo(tagX + tagW - 3, tagY + 4);
+                ctx.lineTo(tagX + tagW - 3, tagY + tagH - 4);
+                ctx.stroke();
+
+                ctx.fillStyle = '#18181B';
+                ctx.font = '700 8.5px "Plus Jakarta Sans", sans-serif';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(labelText, tagX + 8, tagY + tagH / 2 + 0.5);
+
+                // Interactive 2.6x Macro-Zoom Loupe
+                if (loupe && typeof loupe.x === 'number' && typeof loupe.y === 'number') {
+                    const lx = Math.max(54, Math.min(cssW - 54, loupe.x));
+                    const ly = Math.max(54, Math.min(cssH - 54, loupe.y));
+                    const radius = Math.min(62, cssH * 0.30);
+
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(24, 24, 27, 0.35)';
+                    ctx.shadowBlur = 18;
+                    ctx.shadowOffsetY = 6;
+                    ctx.beginPath();
+                    ctx.arc(lx, ly, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = hex;
+                    ctx.fill();
+                    ctx.restore();
+
+                    // Clip inside loupe & render 2.6x magnified weave
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(lx, ly, radius, 0, Math.PI * 2);
+                    ctx.clip();
+
+                    const macroPattern = this.createWeavePattern(ctx, weave, hex, 2.7);
+                    ctx.translate(-lx * 1.6, -ly * 1.6);
+                    ctx.fillStyle = macroPattern;
+                    ctx.fillRect(lx * 1.6 - radius * 2, ly * 1.6 - radius * 2, radius * 5, radius * 5);
+                    ctx.restore();
+
+                    // Glass lens reflection + ring
+                    ctx.save();
+                    const glassGrad = ctx.createLinearGradient(lx - radius, ly - radius, lx + radius, ly + radius);
+                    glassGrad.addColorStop(0, 'rgba(255,255,255,0.26)');
+                    glassGrad.addColorStop(0.45, 'rgba(255,255,255,0.0)');
+                    glassGrad.addColorStop(1, 'rgba(0,0,0,0.18)');
+                    ctx.beginPath();
+                    ctx.arc(lx, ly, radius, 0, Math.PI * 2);
+                    ctx.fillStyle = glassGrad;
+                    ctx.fill();
+
+                    ctx.lineWidth = 3.5;
+                    ctx.strokeStyle = '#FAF8F5';
+                    ctx.stroke();
+
+                    ctx.lineWidth = 1.2;
+                    ctx.strokeStyle = '#2D4A3E';
+                    ctx.beginPath();
+                    ctx.arc(lx, ly, radius + 2, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Mini pill badge on bottom of loupe
+                    const badgeW = 92;
+                    const badgeH = 17;
+                    this.roundedRect(ctx, lx - badgeW / 2, ly + radius - 12, badgeW, badgeH, 8);
+                    ctx.fillStyle = '#18181B';
+                    ctx.fill();
+                    ctx.fillStyle = '#FAF8F5';
+                    ctx.font = '700 8px "Inter", sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('2.6× MACRO STOF', lx, ly + radius - 3.5);
+                    ctx.restore();
+                }
+
+                ctx.restore();
+            }
+
+            /**
+             * Attaches hover/touch/toggle macro-zoom loupe listeners to any canvas element
+             */
+            static attachInteractiveLoupe(canvas, getOptionsFn) {
+                if (!canvas) return;
+                canvas.classList.add('loupe-enabled');
+
+                const renderAt = (clientX, clientY) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = clientX - rect.left;
+                    const y = clientY - rect.top;
+                    this.render(canvas, { ...getOptionsFn(), loupe: { x, y } });
+                };
+
+                canvas.addEventListener('mousemove', (e) => renderAt(e.clientX, e.clientY));
+                canvas.addEventListener('mouseleave', () => {
+                    if (canvas.dataset.loupePinned === 'true') {
+                        const rect = canvas.getBoundingClientRect();
+                        this.render(canvas, { ...getOptionsFn(), loupe: { x: rect.width * 0.62, y: rect.height * 0.46 } });
+                    } else {
+                        this.render(canvas, { ...getOptionsFn(), loupe: null });
+                    }
+                });
+
+                canvas.addEventListener('touchmove', (e) => {
+                    if (e.touches && e.touches[0]) {
+                        renderAt(e.touches[0].clientX, e.touches[0].clientY);
+                    }
+                }, { passive: true });
+            }
+        }
+
+        /* ============================================================================
+         * 3. PERSISTENT REACTIVE CART & PRICING STORE (localStorage)
+         * ============================================================================ */
+        class CartStore {
+            constructor() {
+                this.storageKey = 'noordweef_spa_store_v2';
+                this.listeners = new Set();
+                this.state = {
+                    vatIncl: true,
+                    promoCode: '',
+                    items: []
+                };
+                this.load();
+            }
+
+            load() {
+                try {
+                    const raw = localStorage.getItem(this.storageKey);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && Array.isArray(parsed.items)) {
+                            this.state = { ...this.state, ...parsed };
+                            return;
+                        }
+                    }
+                } catch (err) {
+                    // Fallback gracefully if storage is restricted
+                }
+
+                // Seed 6-pack starter item on very first visit for immediate live demo
+                this.state.items = [
+                    {
+                        id: 'NW-WAF-70__saliegroen',
+                        type: 'standard',
+                        sku: 'NW-WAF-70',
+                        colorKey: 'saliegroen',
+                        units: 6
+                    }
+                ];
+                this.save();
+            }
+
+            save() {
+                try {
+                    localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+                } catch (err) {
+                    // Ignore quota/sandbox errors
+                }
+            }
+
+            subscribe(fn) {
+                this.listeners.add(fn);
+                return () => this.listeners.delete(fn);
+            }
+
+            notify() {
+                this.save();
+                this.listeners.forEach(fn => fn(this.state));
+            }
+
+            setVatIncl(vatIncl) {
+                this.state.vatIncl = Boolean(vatIncl);
+                this.notify();
+            }
+
+            formatMoney(amountIncl, forceIncl = null) {
+                const useIncl = forceIncl !== null ? forceIncl : this.state.vatIncl;
+                const val = useIncl ? amountIncl : (amountIncl / 1.21);
+                return '€' + val.toFixed(2).replace('.', ',');
+            }
+
+            /**
+             * Adds units of a standard SKU; automatically merges same SKU+color and upgrades volume discount
+             */
+            addStandardItem(sku, colorKey, unitsToAdd = 1) {
+                const product = CatalogData.getBySku(sku);
+                if (!product) return null;
+
+                const id = `${sku}__${colorKey}`;
+                const existing = this.state.items.find(i => i.id === id && i.type === 'standard');
+                const prevUnits = existing ? existing.units : 0;
+                const prevDisc = CatalogData.getDiscountForUnits(prevUnits, product.isPrebuiltBundle);
+
+                if (existing) {
+                    existing.units = Math.min(product.stock, existing.units + unitsToAdd);
+                } else {
+                    this.state.items.push({
+                        id,
+                        type: 'standard',
+                        sku,
+                        colorKey,
+                        units: Math.min(product.stock, unitsToAdd)
+                    });
+                }
+
+                const newUnits = existing ? existing.units : unitsToAdd;
+                const newDisc = CatalogData.getDiscountForUnits(newUnits, product.isPrebuiltBundle);
+                this.notify();
+
+                return {
+                    upgradedTier: newDisc > prevDisc ? Math.round(newDisc * 100) : null,
+                    totalUnits: newUnits
+                };
+            }
+
+            /**
+             * Adds a custom configured Mix & Match Bundle with automatic 18% set discount
+             */
+            addCustomBundle({ towelSku, towelColor, towelQty, clothSku, clothColor, clothQty }) {
+                const towel = CatalogData.getBySku(towelSku);
+                const cloth = CatalogData.getBySku(clothSku);
+                if (!towel || !cloth) return;
+
+                const rawIncl = (towel.basePriceIncl * towelQty) + (cloth.basePriceIncl * clothQty);
+                const bundleUnitPriceIncl = rawIncl * (1 - 0.18);
+                const id = `MIX__${towelSku}_${towelColor}_${towelQty}__${clothSku}_${clothColor}_${clothQty}`;
+
+                const existing = this.state.items.find(i => i.id === id);
+                if (existing) {
+                    existing.units += 1;
+                } else {
+                    this.state.items.push({
+                        id,
+                        type: 'custom-bundle',
+                        title: `Mix & Match Set (${towelQty}× 70×70 + ${clothQty}× Vaatdoek)`,
+                        subtitle: `${towelQty}× ${CatalogData.getSwatch(towelColor).name} (${towel.dimensions}) + ${clothQty}× ${CatalogData.getSwatch(clothColor).name} (${cloth.dimensions})`,
+                        weave: towel.weave,
+                        colorKey: towelColor,
+                        unitPriceIncl: bundleUnitPriceIncl,
+                        rawCompareIncl: rawIncl,
+                        units: 1
+                    });
+                }
+                this.notify();
+            }
+
+            updateItemUnits(id, delta) {
+                const idx = this.state.items.findIndex(i => i.id === id);
+                if (idx === -1) return;
+                this.state.items[idx].units += delta;
+                if (this.state.items[idx].units <= 0) {
+                    this.state.items.splice(idx, 1);
+                }
+                this.notify();
+            }
+
+            removeItem(id) {
+                this.state.items = this.state.items.filter(i => i.id !== id);
+                this.notify();
+            }
+
+            clearCart() {
+                this.state.items = [];
+                this.state.promoCode = '';
+                this.notify();
+            }
+
+            applyPromo(rawCode) {
+                const code = (rawCode || '').trim().toUpperCase();
+                const summary = this.getSummary();
+
+                if (!code) {
+                    this.state.promoCode = '';
+                    this.notify();
+                    return { ok: false, message: 'Voer een geldige kortingscode in.' };
+                }
+
+                if (code === 'WELKOM10') {
+                    this.state.promoCode = 'WELKOM10';
+                    this.notify();
+                    return { ok: true, message: 'WELKOM10 toegepast: 10% korting op je winkelwagen!' };
+                }
+
+                if (code === 'ZAKELIJK15') {
+                    if (summary.subtotalIncl < 100) {
+                        return {
+                            ok: false,
+                            message: `ZAKELIJK15 geldt vanaf €100,00 bestelwaarde (nog €${(100 - summary.subtotalIncl).toFixed(2).replace('.', ',')} nodig).`
+                        };
+                    }
+                    this.state.promoCode = 'ZAKELIJK15';
+                    this.notify();
+                    return { ok: true, message: 'ZAKELIJK15 geactiveerd: 15% zakelijke orderkorting!' };
+                }
+
+                return { ok: false, message: 'Onbekende code. Probeer WELKOM10 of ZAKELIJK15 (> €100).' };
+            }
+
+            getSummary() {
+                let subtotalIncl = 0;
+                let totalSavingsTierIncl = 0;
+                let badgeCount = 0;
+
+                const detailedItems = this.state.items.map(item => {
+                    if (item.type === 'custom-bundle') {
+                        const lineIncl = item.unitPriceIncl * item.units;
+                        const savedIncl = (item.rawCompareIncl - item.unitPriceIncl) * item.units;
+                        subtotalIncl += lineIncl;
+                        totalSavingsTierIncl += savedIncl;
+                        badgeCount += item.units;
+                        return {
+                            ...item,
+                            discountPct: 18,
+                            effectiveUnitIncl: item.unitPriceIncl,
+                            lineIncl,
+                            nextHint: null
+                        };
+                    }
+
+                    const product = CatalogData.getBySku(item.sku);
+                    if (!product) return null;
+
+                    const disc = CatalogData.getDiscountForUnits(item.units, product.isPrebuiltBundle);
+                    const effectiveUnitIncl = product.basePriceIncl * (1 - disc);
+                    const lineIncl = effectiveUnitIncl * item.units;
+                    const savedIncl = (product.basePriceIncl * item.units) - lineIncl;
+
+                    subtotalIncl += lineIncl;
+                    totalSavingsTierIncl += savedIncl;
+                    badgeCount += item.units;
+
+                    return {
+                        ...item,
+                        product,
+                        title: product.name,
+                        subtitle: `${CatalogData.getSwatch(item.colorKey).name} • ${product.dimensions} • ${product.gsm} g/m²`,
+                        weave: product.weave,
+                        discountPct: Math.round(disc * 100),
+                        effectiveUnitIncl,
+                        lineIncl,
+                        nextHint: CatalogData.getNextTierHint(item.units, product.isPrebuiltBundle)
+                    };
+                }).filter(Boolean);
+
+                // Validate ZAKELIJK15 minimum threshold dynamically
+                let activeCode = this.state.promoCode;
+                let promoDiscountIncl = 0;
+                if (activeCode === 'WELKOM10') {
+                    promoDiscountIncl = subtotalIncl * 0.10;
+                } else if (activeCode === 'ZAKELIJK15') {
+                    if (subtotalIncl >= 100) {
+                        promoDiscountIncl = subtotalIncl * 0.15;
+                    } else {
+                        activeCode = '';
+                    }
+                }
+
+                const afterPromoIncl = Math.max(0, subtotalIncl - promoDiscountIncl);
+                const freeShippingThresholdIncl = 50;
+                const shippingIncl = (afterPromoIncl === 0 || afterPromoIncl >= freeShippingThresholdIncl) ? 0 : 5.95;
+                const grandTotalIncl = afterPromoIncl + shippingIncl;
+                const grandTotalExcl = grandTotalIncl / 1.21;
+                const vatAmount = grandTotalIncl - grandTotalExcl;
+
+                return {
+                    detailedItems,
+                    badgeCount,
+                    subtotalIncl,
+                    subtotalExcl: subtotalIncl / 1.21,
+                    totalSavingsTierIncl,
+                    activeCode,
+                    promoDiscountIncl,
+                    afterPromoIncl,
+                    freeShippingThresholdIncl,
+                    shippingIncl,
+                    vatAmount,
+                    grandTotalIncl,
+                    grandTotalExcl
+                };
+            }
+        }
+
+        /* ============================================================================
+         * 4. LIGHTWEIGHT SPA ROUTER & NAVIGATION CONTROLLER
+         * ============================================================================ */
+        class Router {
+            constructor(onRouteChange) {
+                this.currentSection = 'top';
+                this.onRouteChange = onRouteChange;
+                window.addEventListener('hashchange', () => this.syncFromHash());
+            }
+
+            navigate(sectionId) {
+                this.currentSection = sectionId;
+                if (this.onRouteChange) this.onRouteChange(sectionId);
+                const el = document.getElementById(sectionId);
+                if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else if (sectionId === 'top') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+
+            syncFromHash() {
+                const hash = window.location.hash.replace('#', '');
+                if (hash) this.navigate(hash);
+            }
+        }
+
+        /* ============================================================================
+         * 5. MAIN SPA UI RENDERER & INTERACTION CONTROLLER
+         * ============================================================================ */
+        class NoordweefUI {
+            constructor(store) {
+                this.store = store;
+                this.root = document.getElementById('app');
+                this.router = new Router((sec) => {
+                    this.uiState.activeNav = sec;
+                });
+
+                // Local Reactive UI State
+                this.uiState = {
+                    activeNav: 'top',
+                    mobileMenuOpen: false,
+                    cartOpen: false,
+
+                    // Hero Canvas interactive state
+                    heroWeave: 'waffle',
+                    heroColor: 'saliegroen',
+                    heroLoupePinned: true,
+
+                    // Catalog Filters
+                    categoryFilter: 'all',
+                    weaveFilter: 'all',
+                    searchQuery: '',
+                    sortBy: 'popularity',
+
+                    // Per-SKU card selections
+                    cardColor: {},
+                    cardTierQty: {},
+
+                    // Size comparison interactive mode ('overlay' | 'side-by-side')
+                    sizeVisualizerMode: 'overlay',
+                    sizeSelectedTowelCount: 4,
+
+                    // Custom Mix & Match Bundel Configurator
+                    bundleConfig: {
+                        towelSku: 'NW-WAF-70',
+                        towelColor: 'saliegroen',
+                        towelQty: 4,
+                        clothSku: 'NW-MIC-35',
+                        clothColor: 'saliegroen',
+                        clothQty: 6
+                    },
+
+                    // Product Detail Modal
+                    detailModalSku: null,
+                    detailModalLoupePinned: true,
+
+                    // Checkout Modal
+                    checkoutOpen: false,
+                    checkoutData: {
+                        customerType: 'particulier',
+                        companyName: '',
+                        kvkNumber: '',
+                        fullName: '',
+                        email: '',
+                        postalCode: '',
+                        houseNumber: '',
+                        streetCity: '',
+                        carrier: 'postnl',
+                        paymentMethod: 'ideal',
+                        idealBank: 'ING',
+                        errors: {}
+                    },
+                    completedOrder: null
+                };
+
+                // Initialize default color & pack selections per SKU
+                CatalogData.getAll().forEach(p => {
+                    this.uiState.cardColor[p.sku] = p.colors[0];
+                    this.uiState.cardTierQty[p.sku] = p.isPrebuiltBundle ? 1 : 6;
+                });
+
+                // Subscribe to CartStore updates
+                this.store.subscribe(() => {
+                    this.updateHeaderAndPrices();
+                    this.renderCartDrawerContents();
+                    if (this.uiState.detailModalSku) this.renderDetailModal();
+                });
+
+                // Handle responsive canvas redraws
+                window.addEventListener('resize', () => {
+                    this.paintAllVisibleCanvases();
+                });
+            }
+
+            mount() {
+                this.renderShell();
+                this.renderCatalogGrid();
+                this.renderSizeVisualizer();
+                this.renderBundleConfigurator();
+                this.renderCartDrawerContents();
+                this.paintHeroCanvas();
+            }
+
+            /* ------------------------------------------------------------------------
+             * FULL APPLICATION SHELL (MOUNTED INTO #app)
+             * ------------------------------------------------------------------------ */
+            renderShell() {
+                this.root.innerHTML = `
+                    <!-- Top Announcement Bar -->
+                    <div class="bg-ink-900 text-alabaster-50 text-xs py-2.5 px-4 border-b border-white/10">
+                        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 mx-auto sm:mx-0">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span>Vóór <strong>23:59</strong> besteld = morgen bezorgd via PostNL of DHL Zakelijk</span>
+                            </div>
+                            <div class="hidden md:flex items-center gap-6 text-alabaster-200">
+                                <span>✓ Gratis verzending vanaf €50</span>
+                                <span>✓ Staffelkorting tot <strong>25%</strong></span>
+                                <span>✓ OEKO-TEX® 100 gecertificeerd</span>
+                            </div>
+                            <div class="hidden sm:flex items-center gap-1.5 text-amber-300 font-semibold">
+                                <span>★ 4,9 / 5</span>
+                                <span class="text-alabaster-200 font-normal">(2.065 reviews)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sticky Navigation Bar -->
+                    <header class="sticky top-0 z-40 bg-alabaster-50/95 backdrop-blur-md border-b border-alabaster-200">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
+                            <!-- Brand Logo -->
+                            <button id="nav-logo-btn" type="button" class="flex items-center gap-3 text-left group focus:outline-none">
+                                <div class="w-10 h-10 rounded-xl bg-forest-600 text-white flex items-center justify-center shadow-sm group-hover:bg-forest-700 transition">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.9" d="M4 7h16M4 12h16M4 17h16M7 4v16M12 4v16M17 4v16"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <span class="font-display font-extrabold text-xl tracking-tight text-ink-900 block leading-none">NOORDWEEF®</span>
+                                    <span class="text-[11px] uppercase tracking-widest text-forest-600 font-semibold">70×70 Textielatelier</span>
+                                </div>
+                            </button>
+
+                            <!-- Desktop Nav -->
+                            <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-ink-800">
+                                <button data-nav-cat="all" class="nav-cat-link hover:text-forest-600 transition">Alle Producten</button>
+                                <button data-nav-cat="handdoeken-70x70" class="nav-cat-link hover:text-forest-600 transition flex items-center gap-1.5">
+                                    Handdoeken 70×70
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-forest-100 text-forest-700">XL</span>
+                                </button>
+                                <button data-nav-cat="vaatdoeken" class="nav-cat-link hover:text-forest-600 transition">Vaatdoeken</button>
+                                <button data-scroll-to="bundel-builder" class="hover:text-forest-600 transition flex items-center gap-1.5">
+                                    Mix & Match Set
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 text-amber-900">-18%</span>
+                                </button>
+                                <button data-scroll-to="formaat-vergelijker" class="hover:text-forest-600 transition">Waarom 70×70?</button>
+                            </nav>
+
+                            <!-- Right Controls: BTW Switcher & Cart -->
+                            <div class="flex items-center gap-2 sm:gap-3">
+                                <div class="flex items-center bg-alabaster-100 p-1 rounded-xl border border-alabaster-200 text-xs font-semibold">
+                                    <button id="vat-btn-incl" type="button" class="px-2.5 py-1.5 rounded-lg transition">Incl. BTW</button>
+                                    <button id="vat-btn-excl" type="button" class="px-2.5 py-1.5 rounded-lg transition">Excl. BTW</button>
+                                </div>
+
+                                <button id="open-cart-btn" type="button" class="relative flex items-center gap-2.5 bg-ink-900 hover:bg-forest-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow-sm">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                    </svg>
+                                    <span class="hidden sm:inline">Winkelwagen</span>
+                                    <span id="header-cart-badge" class="bg-forest-500 text-white text-xs font-bold min-w-[22px] h-[22px] px-1.5 rounded-full flex items-center justify-center">0</span>
+                                </button>
+
+                                <button id="mobile-menu-btn" type="button" aria-label="Menu" class="lg:hidden p-2.5 rounded-xl bg-white border border-alabaster-200 text-ink-900">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Mobile Menu -->
+                        <div id="mobile-nav-drawer" class="hidden lg:hidden bg-white border-t border-alabaster-200 px-4 py-4 space-y-2">
+                            <button data-nav-cat="all" class="nav-cat-link block w-full text-left px-3 py-2.5 rounded-xl hover:bg-alabaster-100 text-sm font-medium">Alle Producten</button>
+                            <button data-nav-cat="handdoeken-70x70" class="nav-cat-link block w-full text-left px-3 py-2.5 rounded-xl hover:bg-alabaster-100 text-sm font-medium">Handdoeken 70×70 cm</button>
+                            <button data-nav-cat="vaatdoeken" class="nav-cat-link block w-full text-left px-3 py-2.5 rounded-xl hover:bg-alabaster-100 text-sm font-medium">Professionele Vaatdoeken</button>
+                            <button data-scroll-to="bundel-builder" class="block w-full text-left px-3 py-2.5 rounded-xl hover:bg-alabaster-100 text-sm font-medium">Mix & Match Bundel Configurator (-18%)</button>
+                            <button data-scroll-to="formaat-vergelijker" class="block w-full text-left px-3 py-2.5 rounded-xl hover:bg-alabaster-100 text-sm font-medium">70×70 cm Oppervlakte-Vergelijker</button>
+                        </div>
+                    </header>
+
+                    <!-- HERO SECTION WITH LIVE PROCEDURAL CANVAS & MACRO LOUPE -->
+                    <section class="relative pt-10 pb-16 lg:pt-16 lg:pb-24 overflow-hidden">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+                                <!-- Left Hero Editorial Copy -->
+                                <div class="lg:col-span-6 space-y-6">
+                                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-forest-100 text-forest-700 text-xs font-bold uppercase tracking-wider">
+                                        <span class="w-2 h-2 rounded-full bg-forest-600"></span>
+                                        Scandinavisch-Nederlands Keukentextiel Atelier
+                                    </div>
+
+                                    <h1 class="font-display font-extrabold text-4xl sm:text-5xl lg:text-[3.35rem] text-ink-900 leading-[1.08] tracking-tight">
+                                        Royale <span class="text-forest-600 underline decoration-alabaster-300 decoration-4 underline-offset-8">70×70 cm</span> handdoeken & bijpassende vaatdoeken.
+                                    </h1>
+
+                                    <p class="text-base sm:text-lg text-zinc-600 leading-relaxed max-w-xl">
+                                        Geen klamme, kleine doekjes meer. Onze vierkante <strong>70×70 cm keukendoeken (tot 550 g/m²)</strong> bieden ruim <strong>50% meer droogoppervlak</strong> dan standaard 50×65 cm doeken, zijn kookwasvast tot 90°C en exact op kleur afgestemd met onze vaatdoeken.
+                                    </p>
+
+                                    <div class="flex flex-wrap items-center gap-3.5 pt-1">
+                                        <button data-nav-cat="handdoeken-70x70" class="nav-cat-link px-7 py-4 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-forest-600/20 transition flex items-center gap-2">
+                                            Bekijk 70×70 Collectie
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                                        </button>
+                                        <button data-scroll-to="bundel-builder" class="px-6 py-4 rounded-2xl bg-white hover:bg-alabaster-100 text-ink-900 border border-alabaster-300 font-semibold text-sm sm:text-base transition flex items-center gap-2">
+                                            Stel Eigen Set Samen
+                                            <span class="text-xs font-bold px-2 py-0.5 rounded-lg bg-forest-100 text-forest-700">-18%</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="grid grid-cols-3 gap-4 pt-6 border-t border-alabaster-200 max-w-lg">
+                                        <div>
+                                            <p class="font-display font-extrabold text-xl sm:text-2xl text-ink-900">4.900 cm²</p>
+                                            <p class="text-xs text-zinc-500 mt-0.5">Vierkant XL formaat</p>
+                                        </div>
+                                        <div>
+                                            <p class="font-display font-extrabold text-xl sm:text-2xl text-ink-900">Tot 550 g/m²</p>
+                                            <p class="text-xs text-zinc-500 mt-0.5">Zware hotel-weving</p>
+                                        </div>
+                                        <div>
+                                            <p class="font-display font-extrabold text-xl sm:text-2xl text-ink-900">Tot -25%</p>
+                                            <p class="text-xs text-zinc-500 mt-0.5">Horeca & gezinsstaffel</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Interactive Canvas Textile Studio -->
+                                <div class="lg:col-span-6">
+                                    <div class="bg-white rounded-3xl p-5 sm:p-6 border border-alabaster-200 shadow-xl">
+                                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                            <div>
+                                                <span class="text-[11px] font-bold uppercase tracking-wider text-forest-600 block">Interactieve Weefsel-Engine</span>
+                                                <h2 id="hero-canvas-caption" class="font-display font-bold text-base text-ink-900">3D Wafelkatoen • Saliegroen</h2>
+                                            </div>
+                                            <button id="hero-loupe-toggle" type="button" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-forest-50 text-forest-700 border border-forest-100 hover:bg-forest-100 transition flex items-center gap-1.5">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7"/></svg>
+                                                <span id="hero-loupe-btn-text">Macro-loep: Aan</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- Live Procedural HTML5 Canvas -->
+                                        <div class="relative rounded-2xl overflow-hidden border border-alabaster-200">
+                                            <canvas id="hero-textile-canvas" class="w-full h-64 sm:h-72 block"></canvas>
+                                            <div class="absolute top-3 left-3 bg-ink-900/80 backdrop-blur text-white text-[11px] font-medium px-2.5 py-1 rounded-lg pointer-events-none">
+                                                Beweeg muis / vinger voor 2.6× garen-zoom
+                                            </div>
+                                        </div>
+
+                                        <!-- Interactive Weave Type Switcher + Color Swatches -->
+                                        <div class="mt-4 space-y-3">
+                                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5" id="hero-weave-buttons">
+                                                ${Object.values(WEAVE_META).map(w => `
+                                                    <button type="button" data-hero-weave="${w.key}" class="hero-weave-btn px-2.5 py-2 rounded-xl text-xs font-semibold border transition truncate">
+                                                        ${w.label.split(' ')[0]} ${w.label.split(' ')[1] || ''}
+                                                    </button>
+                                                `).join('')}
+                                            </div>
+
+                                            <div class="flex items-center justify-between pt-1">
+                                                <div class="flex items-center gap-2" id="hero-swatch-buttons">
+                                                    ${Object.values(SWATCHES).map(s => `
+                                                        <button
+                                                            type="button"
+                                                            data-hero-color="${s.key}"
+                                                            title="${s.name}"
+                                                            aria-label="Kleur ${s.name}"
+                                                            style="background-color: ${s.hex};"
+                                                            class="hero-swatch-btn w-7 h-7 rounded-full border border-black/15 transition transform hover:scale-110"
+                                                        ></button>
+                                                    `).join('')}
+                                                </div>
+                                                <span class="text-xs text-zinc-500 hidden sm:inline">Dubbel gestikte zoom + lus</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- CATALOG SECTION: DYNAMIC FILTERING, SEARCH, SORT & CANVAS CARDS -->
+                    <section id="catalogus" class="py-16 bg-white border-y border-alabaster-200">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-widest text-forest-600">Webshop Collectie</span>
+                                    <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-ink-900 mt-1">70×70 cm Handdoeken & Vaatdoeken</h2>
+                                    <p class="text-sm sm:text-base text-zinc-600 mt-1.5">Klik op een kleurstaal voor realtime weefselweergave of kies direct jouw staffelvoordeel.</p>
+                                </div>
+                                <div id="catalog-vat-pill" class="text-xs font-semibold px-3.5 py-2 rounded-xl bg-alabaster-100 text-ink-800 border border-alabaster-200 self-start md:self-auto">
+                                    Alle prijzen incl. 21% BTW
+                                </div>
+                            </div>
+
+                            <!-- Filter & Search Toolbar -->
+                            <div class="bg-alabaster-50 p-4 rounded-2xl border border-alabaster-200 space-y-4 mb-8">
+                                <div class="flex flex-wrap items-center justify-between gap-3">
+                                    <!-- Category Pills -->
+                                    <div class="flex flex-wrap items-center gap-2" id="cat-filter-group">
+                                        <button type="button" data-cat="all" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Alle producten</button>
+                                        <button type="button" data-cat="handdoeken-70x70" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Handdoeken 70×70 cm</button>
+                                        <button type="button" data-cat="vaatdoeken" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Vaatdoeken</button>
+                                        <button type="button" data-cat="bundels" class="cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition">Voordeelsets</button>
+                                    </div>
+
+                                    <!-- Weave Filter -->
+                                    <div class="flex items-center gap-2">
+                                        <label for="weave-select" class="text-xs font-semibold text-zinc-500">Weving:</label>
+                                        <select id="weave-select" class="px-3 py-2 rounded-xl bg-white border border-alabaster-200 text-xs font-semibold text-ink-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                            <option value="all">Alle weefsels</option>
+                                            <option value="waffle">3D Wafelkatoen</option>
+                                            <option value="terry">Hotel Badstof</option>
+                                            <option value="linen">Keper Halflinnen</option>
+                                            <option value="microfiber">Parel-Microvezel</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-3 border-t border-alabaster-200">
+                                    <!-- Live Keyword Search -->
+                                    <div class="relative flex-1 max-w-md">
+                                        <input id="catalog-search" type="text" placeholder="Zoek op 70×70, 550 g/m², wafel, vaatdoek, GOTS..." class="w-full pl-9 pr-4 py-2.5 rounded-xl bg-white border border-alabaster-200 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                        <svg class="w-4 h-4 text-zinc-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                    </div>
+
+                                    <!-- Sort Dropdown -->
+                                    <div class="flex items-center gap-2">
+                                        <span id="results-counter" class="text-xs text-zinc-500 mr-2"></span>
+                                        <select id="catalog-sort" aria-label="Sorteer op" class="px-3.5 py-2.5 rounded-xl bg-white border border-alabaster-200 text-xs sm:text-sm font-semibold text-ink-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                            <option value="popularity">Meest populair</option>
+                                            <option value="price-asc">Prijs: laag naar hoog</option>
+                                            <option value="price-desc">Prijs: hoog naar laag</option>
+                                            <option value="gsm-desc">Stofgewicht (g/m² hoog-laag)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic Product Cards Container -->
+                            <div id="catalog-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+                        </div>
+                    </section>
+
+                    <!-- CUSTOM MIX & MATCH BUNDEL BUILDER (JS CONFIGURATOR -18%) -->
+                    <section id="bundel-builder" class="py-20 bg-alabaster-50">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div id="bundle-configurator-mount"></div>
+                        </div>
+                    </section>
+
+                    <!-- INTERACTIVE 70x70 CM VS 50x65 CM SIZE VISUALIZER WIDGET -->
+                    <section id="formaat-vergelijker" class="py-20 bg-white border-t border-alabaster-200">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div id="size-visualizer-mount"></div>
+                        </div>
+                    </section>
+
+                    <!-- FOOTER -->
+                    <footer class="bg-ink-900 text-alabaster-100 pt-16 pb-12">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-white/10">
+                                <div class="lg:col-span-5 space-y-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-xl bg-forest-600 text-white flex items-center justify-center">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M4 12h16M4 17h16M7 4v16M12 4v16M17 4v16"/></svg>
+                                        </div>
+                                        <span class="font-display font-extrabold text-xl text-white">NOORDWEEF®</span>
+                                    </div>
+                                    <p class="text-sm text-alabaster-200/80 max-w-md leading-relaxed">
+                                        Specialist in royaal 70×70 cm keukentextiel en kleur-matchende professionele vaatdoeken. Duurzaam geweven voor zowel veeleisende thuiskoks als Nederlandse & Belgische horeca.
+                                    </p>
+                                    <div class="flex flex-wrap gap-2 pt-1 text-xs">
+                                        <span class="px-3 py-1 rounded-lg bg-white/10 text-emerald-300 font-semibold">Code: WELKOM10 (-10%)</span>
+                                        <span class="px-3 py-1 rounded-lg bg-white/10 text-amber-200 font-semibold">Code: ZAKELIJK15 (> €100)</span>
+                                    </div>
+                                </div>
+
+                                <div class="lg:col-span-3 space-y-2.5 text-sm">
+                                    <h4 class="font-display font-bold text-white uppercase tracking-wider text-xs">Collectie</h4>
+                                    <button data-nav-cat="handdoeken-70x70" class="nav-cat-link block text-alabaster-200/80 hover:text-white">70×70 Wafelhanddoeken</button>
+                                    <button data-nav-cat="handdoeken-70x70" class="nav-cat-link block text-alabaster-200/80 hover:text-white">70×70 Hotel-Badstof (550 g/m²)</button>
+                                    <button data-nav-cat="vaatdoeken" class="nav-cat-link block text-alabaster-200/80 hover:text-white">Vaatdoeken 35×35 cm</button>
+                                    <button data-scroll-to="bundel-builder" class="block text-alabaster-200/80 hover:text-white">Mix & Match Bundel (-18%)</button>
+                                </div>
+
+                                <div class="lg:col-span-4 space-y-2 text-sm">
+                                    <h4 class="font-display font-bold text-white uppercase tracking-wider text-xs">Atelier & Zakelijke Service</h4>
+                                    <p class="text-alabaster-200/80">Textielplein 18, 7514 AN Enschede</p>
+                                    <p class="text-white font-semibold">053 – 890 44 10 • service@noordweef.nl</p>
+                                    <p class="text-xs text-alabaster-200/60 pt-1">KvK: 88392014 • BTW: NL864611029B01<br>iDEAL • Bancontact • Op Factuur 14 dagen (B2B)</p>
+                                </div>
+                            </div>
+
+                            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-alabaster-200/60">
+                                <p>© 2026 NOORDWEEF Textielatelier B.V. — 100% ES6 JavaScript E-Commerce Engine.</p>
+                                <div class="flex items-center gap-3">
+                                    <span>WebwinkelKeur 9.8</span>
+                                    <span>•</span>
+                                    <span>PostNL & DHL Zakelijk</span>
+                                </div>
+                            </div>
+                        </div>
+                    </footer>
+
+                    <!-- PRODUCT DETAIL MODAL (WITH INTERACTIVE MACRO LOUPE) -->
+                    <div id="detail-modal-backdrop" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-ink-900/65 backdrop-blur-sm">
+                        <div id="detail-modal-panel" class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-alabaster-200 relative"></div>
+                    </div>
+
+                    <!-- PERSISTENT SLIDE-OVER WINKELWAGEN -->
+                    <div id="cart-backdrop" class="fixed inset-0 z-50 hidden bg-ink-900/50 backdrop-blur-sm"></div>
+                    <aside id="cart-drawer" class="fixed top-0 right-0 z-50 h-full w-full sm:w-[460px] bg-alabaster-50 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col border-l border-alabaster-200"></aside>
+
+                    <!-- COMPLETE INTERACTIVE CHECKOUT & FACTUUR MODAL -->
+                    <div id="checkout-backdrop" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-5 bg-ink-900/70 backdrop-blur-sm">
+                        <div id="checkout-panel" class="bg-white rounded-3xl max-w-3xl w-full max-h-[94vh] overflow-y-auto shadow-2xl border border-alabaster-200"></div>
+                    </div>
+
+                    <!-- TOAST NOTIFICATION CONTAINER -->
+                    <div id="toast-stack" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm"></div>
+                `;
+
+                this.bindShellEvents();
+                this.updateHeaderAndPrices();
+                this.syncHeroControls();
+            }
+
+            bindShellEvents() {
+                document.getElementById('nav-logo-btn').addEventListener('click', () => this.router.navigate('top'));
+
+                document.getElementById('vat-btn-incl').addEventListener('click', () => {
+                    this.store.setVatIncl(true);
+                    this.showToast('Prijzen worden getoond inclusief 21% BTW.');
+                });
+
+                document.getElementById('vat-btn-excl').addEventListener('click', () => {
+                    this.store.setVatIncl(false);
+                    this.showToast('Zakelijke weergave: alle prijzen exclusief 21% BTW.');
+                });
+
+                document.getElementById('open-cart-btn').addEventListener('click', () => this.toggleCart(true));
+                document.getElementById('cart-backdrop').addEventListener('click', () => this.toggleCart(false));
+
+                document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                    this.uiState.mobileMenuOpen = !this.uiState.mobileMenuOpen;
+                    document.getElementById('mobile-nav-drawer').classList.toggle('hidden', !this.uiState.mobileMenuOpen);
+                });
+
+                // Category & section links
+                this.root.querySelectorAll('.nav-cat-link').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const cat = btn.dataset.navCat || 'all';
+                        this.uiState.categoryFilter = cat;
+                        this.uiState.mobileMenuOpen = false;
+                        document.getElementById('mobile-nav-drawer').classList.add('hidden');
+                        this.renderCatalogGrid();
+                        this.router.navigate('catalogus');
+                    });
+                });
+
+                this.root.querySelectorAll('[data-scroll-to]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.uiState.mobileMenuOpen = false;
+                        document.getElementById('mobile-nav-drawer').classList.add('hidden');
+                        this.router.navigate(btn.dataset.scrollTo);
+                    });
+                });
+
+                // Hero Interactive Canvas Controls
+                const heroCanvas = document.getElementById('hero-textile-canvas');
+                heroCanvas.dataset.loupePinned = 'true';
+                TextileCanvasRenderer.attachInteractiveLoupe(heroCanvas, () => ({
+                    weave: this.uiState.heroWeave,
+                    hex: CatalogData.getSwatch(this.uiState.heroColor).hex,
+                    dimensions: '70×70 cm'
+                }));
+
+                document.getElementById('hero-loupe-toggle').addEventListener('click', () => {
+                    this.uiState.heroLoupePinned = !this.uiState.heroLoupePinned;
+                    heroCanvas.dataset.loupePinned = String(this.uiState.heroLoupePinned);
+                    document.getElementById('hero-loupe-btn-text').textContent =
+                        `Macro-loep: ${this.uiState.heroLoupePinned ? 'Aan' : 'Uit'}`;
+                    this.paintHeroCanvas();
+                });
+
+                document.getElementById('hero-weave-buttons').addEventListener('click', (e) => {
+                    const btn = e.target.closest('[data-hero-weave]');
+                    if (!btn) return;
+                    this.uiState.heroWeave = btn.dataset.heroWeave;
+                    this.syncHeroControls();
+                    this.paintHeroCanvas();
+                });
+
+                document.getElementById('hero-swatch-buttons').addEventListener('click', (e) => {
+                    const btn = e.target.closest('[data-hero-color]');
+                    if (!btn) return;
+                    this.uiState.heroColor = btn.dataset.heroColor;
+                    this.syncHeroControls();
+                    this.paintHeroCanvas();
+                });
+
+                // Catalog Filter Controls
+                document.getElementById('cat-filter-group').addEventListener('click', (e) => {
+                    const btn = e.target.closest('[data-cat]');
+                    if (!btn) return;
+                    this.uiState.categoryFilter = btn.dataset.cat;
+                    this.renderCatalogGrid();
+                });
+
+                document.getElementById('weave-select').addEventListener('change', (e) => {
+                    this.uiState.weaveFilter = e.target.value;
+                    this.renderCatalogGrid();
+                });
+
+                document.getElementById('catalog-search').addEventListener('input', (e) => {
+                    this.uiState.searchQuery = e.target.value;
+                    this.renderCatalogGrid();
+                });
+
+                document.getElementById('catalog-sort').addEventListener('change', (e) => {
+                    this.uiState.sortBy = e.target.value;
+                    this.renderCatalogGrid();
+                });
+
+                // Modal backdrop close handlers
+                document.getElementById('detail-modal-backdrop').addEventListener('click', (e) => {
+                    if (e.target.id === 'detail-modal-backdrop') this.closeDetailModal();
+                });
+                document.getElementById('checkout-backdrop').addEventListener('click', (e) => {
+                    if (e.target.id === 'checkout-backdrop') this.closeCheckoutModal();
+                });
+            }
+
+            syncHeroControls() {
+                const weaveObj = CatalogData.getWeave(this.uiState.heroWeave);
+                const swatchObj = CatalogData.getSwatch(this.uiState.heroColor);
+                document.getElementById('hero-canvas-caption').textContent = `${weaveObj.label} • ${swatchObj.name}`;
+
+                document.querySelectorAll('.hero-weave-btn').forEach(btn => {
+                    const active = btn.dataset.heroWeave === this.uiState.heroWeave;
+                    btn.className = `hero-weave-btn px-2.5 py-2 rounded-xl text-xs font-semibold border transition truncate ${
+                        active ? 'bg-ink-900 text-white border-ink-900' : 'bg-alabaster-50 text-ink-800 border-alabaster-200 hover:bg-alabaster-100'
+                    }`;
+                });
+
+                document.querySelectorAll('.hero-swatch-btn').forEach(btn => {
+                    const active = btn.dataset.heroColor === this.uiState.heroColor;
+                    btn.className = `hero-swatch-btn w-7 h-7 rounded-full border border-black/15 transition transform ${
+                        active ? 'ring-2 ring-offset-2 ring-ink-900 scale-110' : 'opacity-80 hover:opacity-100 hover:scale-105'
+                    }`;
+                });
+            }
+
+            paintHeroCanvas() {
+                const canvas = document.getElementById('hero-textile-canvas');
+                if (!canvas) return;
+                const rect = canvas.getBoundingClientRect();
+                TextileCanvasRenderer.render(canvas, {
+                    weave: this.uiState.heroWeave,
+                    hex: CatalogData.getSwatch(this.uiState.heroColor).hex,
+                    dimensions: '70×70 cm',
+                    loupe: this.uiState.heroLoupePinned ? { x: rect.width * 0.65, y: rect.height * 0.45 } : null
+                });
+            }
+
+            updateHeaderAndPrices() {
+                const incl = this.store.state.vatIncl;
+                const btnIncl = document.getElementById('vat-btn-incl');
+                const btnExcl = document.getElementById('vat-btn-excl');
+
+                if (btnIncl && btnExcl) {
+                    btnIncl.className = `px-2.5 py-1.5 rounded-lg transition ${incl ? 'bg-white text-ink-900 shadow-sm' : 'text-zinc-500 hover:text-ink-900'}`;
+                    btnExcl.className = `px-2.5 py-1.5 rounded-lg transition ${!incl ? 'bg-ink-900 text-white shadow-sm' : 'text-zinc-500 hover:text-ink-900'}`;
+                }
+
+                const vatPill = document.getElementById('catalog-vat-pill');
+                if (vatPill) {
+                    vatPill.textContent = incl ? 'Alle prijzen incl. 21% BTW (Particulier)' : 'Alle prijzen excl. 21% BTW (Zakelijk / Horeca)';
+                }
+
+                const summary = this.store.getSummary();
+                const badge = document.getElementById('header-cart-badge');
+                if (badge) badge.textContent = summary.badgeCount;
+
+                this.renderCatalogGrid();
+                this.renderBundleConfigurator();
+            }
+
+            /* ------------------------------------------------------------------------
+             * DYNAMIC CATALOG RENDERER WITH REALTIME <CANVAS> SWATCHES
+             * ------------------------------------------------------------------------ */
+            renderCatalogGrid() {
+                const grid = document.getElementById('catalog-grid');
+                if (!grid) return;
+
+                // Update Category Tab Highlights
+                document.querySelectorAll('.cat-pill').forEach(btn => {
+                    const active = btn.dataset.cat === this.uiState.categoryFilter;
+                    btn.className = `cat-pill px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition ${
+                        active ? 'bg-ink-900 text-white shadow-sm' : 'bg-white text-ink-800 border border-alabaster-200 hover:bg-alabaster-100'
+                    }`;
+                });
+
+                const q = this.uiState.searchQuery.trim().toLowerCase();
+                let list = CatalogData.getAll().filter(p => {
+                    const catOk = this.uiState.categoryFilter === 'all' || p.category === this.uiState.categoryFilter;
+                    const weaveOk = this.uiState.weaveFilter === 'all' || p.weave === this.uiState.weaveFilter;
+                    const searchOk = !q ||
+                        p.name.toLowerCase().includes(q) ||
+                        p.sku.toLowerCase().includes(q) ||
+                        p.dimensions.toLowerCase().includes(q) ||
+                        String(p.gsm).includes(q) ||
+                        CatalogData.getWeave(p.weave).label.toLowerCase().includes(q) ||
+                        p.description.toLowerCase().includes(q);
+                    return catOk && weaveOk && searchOk;
+                });
+
+                list.sort((a, b) => {
+                    if (this.uiState.sortBy === 'price-asc') return a.basePriceIncl - b.basePriceIncl;
+                    if (this.uiState.sortBy === 'price-desc') return b.basePriceIncl - a.basePriceIncl;
+                    if (this.uiState.sortBy === 'gsm-desc') return b.gsm - a.gsm;
+                    return b.popularity - a.popularity;
+                });
+
+                const counter = document.getElementById('results-counter');
+                if (counter) counter.textContent = `${list.length} product${list.length === 1 ? '' : 'en'}`;
+
+                if (list.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full bg-alabaster-50 rounded-3xl p-12 text-center border border-alabaster-200">
+                            <p class="font-display font-bold text-lg text-ink-900">Geen textiel gevonden voor deze filtercombinatie.</p>
+                            <p class="text-sm text-zinc-500 mt-1">Wis je zoekopdracht of bekijk alle 70×70 cm handdoeken en vaatdoeken.</p>
+                            <button id="reset-catalog-btn" type="button" class="mt-4 px-5 py-2.5 rounded-xl bg-forest-600 text-white text-sm font-semibold hover:bg-forest-700 transition">
+                                Filters herstellen
+                            </button>
+                        </div>
+                    `;
+                    document.getElementById('reset-catalog-btn').addEventListener('click', () => {
+                        this.uiState.categoryFilter = 'all';
+                        this.uiState.weaveFilter = 'all';
+                        this.uiState.searchQuery = '';
+                        document.getElementById('catalog-search').value = '';
+                        document.getElementById('weave-select').value = 'all';
+                        this.renderCatalogGrid();
+                    });
+                    return;
+                }
+
+                grid.innerHTML = list.map(product => {
+                    const colorKey = this.uiState.cardColor[product.sku];
+                    const swatch = CatalogData.getSwatch(colorKey);
+                    const weaveMeta = CatalogData.getWeave(product.weave);
+                    const selectedQty = this.uiState.cardTierQty[product.sku];
+                    const disc = CatalogData.getDiscountForUnits(selectedQty, product.isPrebuiltBundle);
+                    const unitIncl = product.basePriceIncl * (1 - disc);
+                    const totalTierIncl = unitIncl * selectedQty;
+                    const savedIncl = (product.basePriceIncl * selectedQty) - totalTierIncl;
+
+                    const tierOptions = product.isPrebuiltBundle
+                        ? [
+                            { qty: 1, label: '1 Voordeelset' },
+                            { qty: 2, label: '2 Sets (-10% extra)' },
+                            { qty: 4, label: '4 Sets (-15% extra)' }
+                        ]
+                        : VOLUME_TIERS;
+
+                    return `
+                        <article class="bg-alabaster-50/50 hover:bg-white rounded-3xl border border-alabaster-200 hover:border-forest-500/40 p-4 flex flex-col justify-between shadow-sm hover:shadow-xl transition-all duration-300">
+                            <div>
+                                <!-- Procedural Canvas Card Visual -->
+                                <div class="relative rounded-2xl overflow-hidden border border-alabaster-200 cursor-pointer group" data-open-detail="${product.sku}">
+                                    <canvas id="card-canvas-${product.sku}" class="w-full h-48 block"></canvas>
+                                    <span class="absolute top-2.5 left-2.5 bg-ink-900/90 text-white text-[11px] font-bold px-2.5 py-1 rounded-lg">
+                                        ${product.badge}
+                                    </span>
+                                    <span class="absolute bottom-2.5 left-2.5 bg-white/95 text-ink-900 text-[11px] font-semibold px-2.5 py-1 rounded-lg shadow-sm group-hover:bg-forest-600 group-hover:text-white transition">
+                                        🔍 Macro-loep & details
+                                    </span>
+                                </div>
+
+                                <!-- Specs & Rating Row -->
+                                <div class="flex items-center justify-between gap-2 mt-3 text-[11px]">
+                                    <div class="flex items-center gap-1.5 font-semibold text-ink-800">
+                                        <span class="px-2 py-0.5 rounded-md bg-alabaster-200/70">${product.dimensions}</span>
+                                        <span class="px-2 py-0.5 rounded-md bg-alabaster-200/70">${product.gsm} g/m²</span>
+                                    </div>
+                                    <span class="text-amber-600 font-semibold">★ ${product.rating.toFixed(1)} <span class="text-zinc-400 font-normal">(${product.reviews})</span></span>
+                                </div>
+
+                                <!-- Title & Weave -->
+                                <div class="mt-2">
+                                    <span class="text-[11px] font-bold uppercase tracking-wider text-forest-600">${weaveMeta.label}</span>
+                                    <h3 data-open-detail="${product.sku}" class="font-display font-bold text-base text-ink-900 mt-0.5 leading-snug cursor-pointer hover:text-forest-600 transition">
+                                        ${product.name}
+                                    </h3>
+                                </div>
+
+                                <!-- Swatches -->
+                                <div class="mt-3">
+                                    <div class="flex items-center justify-between text-xs mb-1.5">
+                                        <span class="text-zinc-500">Kleur: <strong class="text-ink-900">${swatch.name}</strong></span>
+                                        <span class="text-[11px] text-emerald-700 font-medium">${product.stock} op voorraad</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        ${product.colors.map(cKey => {
+                                            const s = CatalogData.getSwatch(cKey);
+                                            const active = cKey === colorKey;
+                                            return `
+                                                <button
+                                                    type="button"
+                                                    data-card-swatch="${product.sku}"
+                                                    data-color-key="${cKey}"
+                                                    title="${s.name}"
+                                                    aria-label="${s.name}"
+                                                    style="background-color: ${s.hex};"
+                                                    class="w-6 h-6 rounded-full border border-black/15 transition transform ${active ? 'ring-2 ring-offset-2 ring-ink-900 scale-110' : 'opacity-80 hover:opacity-100 hover:scale-110'}"
+                                                ></button>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+
+                                <!-- Staffelkorting Volume Selector -->
+                                <div class="mt-3.5">
+                                    <div class="flex items-center justify-between text-[11px] mb-1">
+                                        <span class="text-zinc-500 font-medium">Staffelkorting kiezen:</span>
+                                        ${savedIncl > 0.01 ? `<span class="text-emerald-700 font-bold">Bespaar ${this.store.formatMoney(savedIncl)}</span>` : `<span class="text-zinc-400">Vanaf 6 st. -10%</span>`}
+                                    </div>
+                                    <select data-card-tier="${product.sku}" aria-label="Staffel kiezen" class="w-full px-3 py-2 rounded-xl bg-white border border-alabaster-200 text-xs font-semibold text-ink-900 focus:outline-none focus:ring-2 focus:ring-forest-600 cursor-pointer">
+                                        ${tierOptions.map(t => `
+                                            <option value="${t.qty}" ${t.qty === selectedQty ? 'selected' : ''}>${t.label}</option>
+                                        `).join('')}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Card Footer: Dynamic Price & Add Button -->
+                            <div class="mt-4 pt-3.5 border-t border-alabaster-200 flex items-end justify-between gap-2">
+                                <div>
+                                    <span class="font-display font-extrabold text-xl text-ink-900 block leading-none">
+                                        ${this.store.formatMoney(totalTierIncl)}
+                                    </span>
+                                    <span class="text-[11px] text-zinc-500 mt-1 block">
+                                        ${this.store.formatMoney(unitIncl)} p/st • ${this.store.state.vatIncl ? 'incl.' : 'excl.'} BTW
+                                    </span>
+                                </div>
+                                <button
+                                    type="button"
+                                    data-add-sku="${product.sku}"
+                                    class="px-4 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white text-xs font-semibold transition shadow-sm flex items-center gap-1.5 shrink-0"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 6v12m6-6H6"/></svg>
+                                    In wagen
+                                </button>
+                            </div>
+                        </article>
+                    `;
+                }).join('');
+
+                // Paint each product card's <canvas>
+                list.forEach(product => {
+                    this.paintProductCardCanvas(product.sku);
+                });
+
+                // Delegate card interactions cleanly
+                grid.querySelectorAll('[data-card-swatch]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const sku = btn.dataset.cardSwatch;
+                        const cKey = btn.dataset.colorKey;
+                        this.uiState.cardColor[sku] = cKey;
+                        this.renderCatalogGrid();
+                    });
+                });
+
+                grid.querySelectorAll('[data-card-tier]').forEach(sel => {
+                    sel.addEventListener('change', () => {
+                        this.uiState.cardTierQty[sel.dataset.cardTier] = parseInt(sel.value, 10);
+                        this.renderCatalogGrid();
+                    });
+                });
+
+                grid.querySelectorAll('[data-add-sku]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const sku = btn.dataset.addSku;
+                        const colorKey = this.uiState.cardColor[sku];
+                        const qty = this.uiState.cardTierQty[sku];
+                        const res = this.store.addStandardItem(sku, colorKey, qty);
+                        const prod = CatalogData.getBySku(sku);
+                        const msg = res && res.upgradedTier
+                            ? `${qty}× ${prod.name} toegevoegd — Staffelkorting automatisch verhoogd naar -${res.upgradedTier}%!`
+                            : `${qty}× ${prod.name} (${CatalogData.getSwatch(colorKey).name}) toegevoegd.`;
+                        this.showToast(msg);
+                        this.toggleCart(true);
+                    });
+                });
+
+                grid.querySelectorAll('[data-open-detail]').forEach(el => {
+                    el.addEventListener('click', () => this.openDetailModal(el.dataset.openDetail));
+                });
+            }
+
+            paintProductCardCanvas(sku) {
+                const product = CatalogData.getBySku(sku);
+                const canvas = document.getElementById(`card-canvas-${sku}`);
+                if (!product || !canvas) return;
+                const colorKey = this.uiState.cardColor[sku];
+                TextileCanvasRenderer.render(canvas, {
+                    weave: product.weave,
+                    hex: CatalogData.getSwatch(colorKey).hex,
+                    dimensions: product.category === 'bundels' ? '70×70 SET' : product.dimensions,
+                    isDishcloth: product.category === 'vaatdoeken',
+                    isBundle: product.category === 'bundels'
+                });
+            }
+
+            paintAllVisibleCanvases() {
+                this.paintHeroCanvas();
+                CatalogData.getAll().forEach(p => this.paintProductCardCanvas(p.sku));
+                this.paintBundlePreviewCanvases();
+                if (this.uiState.detailModalSku) this.paintDetailModalCanvas();
+            }
+
+            /* ------------------------------------------------------------------------
+             * CUSTOM MIX & MATCH BUNDEL BUILDER (18% SET DISCOUNT)
+             * ------------------------------------------------------------------------ */
+            renderBundleConfigurator() {
+                const mount = document.getElementById('bundle-configurator-mount');
+                if (!mount) return;
+
+                const cfg = this.uiState.bundleConfig;
+                const towels = CatalogData.getAll().filter(p => p.category === 'handdoeken-70x70');
+                const cloths = CatalogData.getAll().filter(p => p.category === 'vaatdoeken');
+
+                const selectedTowel = CatalogData.getBySku(cfg.towelSku) || towels[0];
+                const selectedCloth = CatalogData.getBySku(cfg.clothSku) || cloths[0];
+
+                if (!selectedTowel.colors.includes(cfg.towelColor)) cfg.towelColor = selectedTowel.colors[0];
+                if (!selectedCloth.colors.includes(cfg.clothColor)) cfg.clothColor = selectedCloth.colors[0];
+
+                const normalTotalIncl = (selectedTowel.basePriceIncl * cfg.towelQty) + (selectedCloth.basePriceIncl * cfg.clothQty);
+                const bundlePriceIncl = normalTotalIncl * (1 - 0.18);
+                const savingsIncl = normalTotalIncl - bundlePriceIncl;
+
+                mount.innerHTML = `
+                    <div class="bg-white rounded-3xl p-6 sm:p-10 border border-alabaster-200 shadow-lg">
+                        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-8 border-b border-alabaster-200">
+                            <div>
+                                <span class="inline-block text-xs font-bold uppercase tracking-widest text-forest-600">Interactieve Bundel Builder</span>
+                                <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-ink-900 mt-1">
+                                    Stel jouw eigen Mix & Match Keukenset samen
+                                </h2>
+                                <p class="text-sm sm:text-base text-zinc-600 mt-1.5 max-w-2xl">
+                                    Combineer jouw favoriete 70×70 cm handdoeken met bijpassende of contrasterende vaatdoeken en ontvang direct <strong>18% bundelkorting</strong>.
+                                </p>
+                            </div>
+                            <button id="match-colors-btn" type="button" class="self-start lg:self-auto px-4 py-2.5 rounded-xl bg-alabaster-100 hover:bg-alabaster-200 text-ink-900 text-xs font-semibold transition">
+                                ✨ Kleuren 1-op-1 gelijk trekken
+                            </button>
+                        </div>
+
+                        <div class="grid lg:grid-cols-12 gap-8 pt-8 items-center">
+                            <!-- Step 1 & 2 Controls -->
+                            <div class="lg:col-span-7 space-y-6">
+                                <!-- Step 1: 70x70 Towel -->
+                                <div class="bg-alabaster-50 p-5 rounded-2xl border border-alabaster-200 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold uppercase tracking-wider text-forest-600">Stap 1 • Handdoeken 70×70 cm</span>
+                                        <div class="flex items-center gap-1.5">
+                                            ${[4, 6, 8].map(q => `
+                                                <button type="button" data-b-towel-qty="${q}" class="px-3 py-1 rounded-lg text-xs font-bold transition ${cfg.towelQty === q ? 'bg-ink-900 text-white' : 'bg-white text-ink-800 border border-alabaster-200'}">${q} stuks</button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+
+                                    <select id="b-towel-sku" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-alabaster-200 text-sm font-semibold text-ink-900">
+                                        ${towels.map(t => `<option value="${t.sku}" ${t.sku === selectedTowel.sku ? 'selected' : ''}>${t.name} (${t.gsm} g/m²)</option>`).join('')}
+                                    </select>
+
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="text-xs text-zinc-500">Kleur (${CatalogData.getSwatch(cfg.towelColor).name}):</span>
+                                        ${selectedTowel.colors.map(cKey => {
+                                            const s = CatalogData.getSwatch(cKey);
+                                            return `<button type="button" data-b-towel-color="${cKey}" style="background-color:${s.hex}" class="w-6 h-6 rounded-full border border-black/15 ${cKey === cfg.towelColor ? 'ring-2 ring-offset-2 ring-ink-900 scale-110' : 'opacity-80'}"></button>`;
+                                        }).join('')}
+                                    </div>
+                                </div>
+
+                                <!-- Step 2: Vaatdoeken -->
+                                <div class="bg-alabaster-50 p-5 rounded-2xl border border-alabaster-200 space-y-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-xs font-bold uppercase tracking-wider text-forest-600">Stap 2 • Bijpassende Vaatdoeken (35×35 cm)</span>
+                                        <div class="flex items-center gap-1.5">
+                                            ${[6, 8, 12].map(q => `
+                                                <button type="button" data-b-cloth-qty="${q}" class="px-3 py-1 rounded-lg text-xs font-bold transition ${cfg.clothQty === q ? 'bg-ink-900 text-white' : 'bg-white text-ink-800 border border-alabaster-200'}">${q} stuks</button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+
+                                    <select id="b-cloth-sku" class="w-full px-3.5 py-2.5 rounded-xl bg-white border border-alabaster-200 text-sm font-semibold text-ink-900">
+                                        ${cloths.map(c => `<option value="${c.sku}" ${c.sku === selectedCloth.sku ? 'selected' : ''}>${c.name} (${c.gsm} g/m²)</option>`).join('')}
+                                    </select>
+
+                                    <div class="flex items-center gap-2.5">
+                                        <span class="text-xs text-zinc-500">Kleur (${CatalogData.getSwatch(cfg.clothColor).name}):</span>
+                                        ${selectedCloth.colors.map(cKey => {
+                                            const s = CatalogData.getSwatch(cKey);
+                                            return `<button type="button" data-b-cloth-color="${cKey}" style="background-color:${s.hex}" class="w-6 h-6 rounded-full border border-black/15 ${cKey === cfg.clothColor ? 'ring-2 ring-offset-2 ring-ink-900 scale-110' : 'opacity-80'}"></button>`;
+                                        }).join('')}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Live Bundle Canvas Preview & Summary Card -->
+                            <div class="lg:col-span-5 bg-alabaster-50 rounded-3xl p-6 border border-alabaster-200 space-y-5">
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <canvas id="bundle-towel-canvas" class="w-full h-36 rounded-2xl border border-alabaster-200 block"></canvas>
+                                        <p class="text-[11px] font-semibold text-center text-ink-800 mt-1.5">${cfg.towelQty}× Handdoek 70×70</p>
+                                    </div>
+                                    <div>
+                                        <canvas id="bundle-cloth-canvas" class="w-full h-36 rounded-2xl border border-alabaster-200 block"></canvas>
+                                        <p class="text-[11px] font-semibold text-center text-ink-800 mt-1.5">${cfg.clothQty}× Vaatdoek 35×35</p>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-4 rounded-2xl border border-alabaster-200 space-y-2 text-sm">
+                                    <div class="flex justify-between text-zinc-500">
+                                        <span>Losse verkoopwaarde (${cfg.towelQty + cfg.clothQty} items)</span>
+                                        <span class="line-through">${this.store.formatMoney(normalTotalIncl)}</span>
+                                    </div>
+                                    <div class="flex justify-between text-emerald-700 font-semibold">
+                                        <span>Automatische Setkorting (18%)</span>
+                                        <span>-${this.store.formatMoney(savingsIncl)}</span>
+                                    </div>
+                                    <div class="flex justify-between items-baseline pt-2 border-t border-alabaster-200">
+                                        <span class="font-display font-bold text-ink-900">Jouw Setprijs</span>
+                                        <div class="text-right">
+                                            <span class="font-display font-extrabold text-2xl text-ink-900">${this.store.formatMoney(bundlePriceIncl)}</span>
+                                            <span class="block text-[11px] text-zinc-500">${this.store.state.vatIncl ? 'incl. 21% BTW' : 'excl. 21% BTW'}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button id="add-custom-bundle-btn" type="button" class="w-full py-4 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-sm sm:text-base shadow-lg shadow-forest-600/20 transition">
+                                    Voeg ${cfg.towelQty + cfg.clothQty}-delige Set toe aan Winkelwagen
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                this.paintBundlePreviewCanvases();
+
+                // Bind Configurator Events
+                document.getElementById('b-towel-sku').addEventListener('change', (e) => {
+                    cfg.towelSku = e.target.value;
+                    this.renderBundleConfigurator();
+                });
+                document.getElementById('b-cloth-sku').addEventListener('change', (e) => {
+                    cfg.clothSku = e.target.value;
+                    this.renderBundleConfigurator();
+                });
+
+                mount.querySelectorAll('[data-b-towel-qty]').forEach(b => {
+                    b.addEventListener('click', () => {
+                        cfg.towelQty = parseInt(b.dataset.bTowelQty, 10);
+                        this.renderBundleConfigurator();
+                    });
+                });
+                mount.querySelectorAll('[data-b-cloth-qty]').forEach(b => {
+                    b.addEventListener('click', () => {
+                        cfg.clothQty = parseInt(b.dataset.bClothQty, 10);
+                        this.renderBundleConfigurator();
+                    });
+                });
+                mount.querySelectorAll('[data-b-towel-color]').forEach(b => {
+                    b.addEventListener('click', () => {
+                        cfg.towelColor = b.dataset.bTowelColor;
+                        this.renderBundleConfigurator();
+                    });
+                });
+                mount.querySelectorAll('[data-b-cloth-color]').forEach(b => {
+                    b.addEventListener('click', () => {
+                        cfg.clothColor = b.dataset.bClothColor;
+                        this.renderBundleConfigurator();
+                    });
+                });
+
+                document.getElementById('match-colors-btn').addEventListener('click', () => {
+                    if (selectedCloth.colors.includes(cfg.towelColor)) {
+                        cfg.clothColor = cfg.towelColor;
+                        this.renderBundleConfigurator();
+                        this.showToast(`Vaatdoekkleur afgestemd op ${CatalogData.getSwatch(cfg.towelColor).name}.`);
+                    } else {
+                        this.showToast('Kies eerst een kleur die voor beide weefsels beschikbaar is.');
+                    }
+                });
+
+                document.getElementById('add-custom-bundle-btn').addEventListener('click', () => {
+                    this.store.addCustomBundle({ ...cfg });
+                    this.showToast(`Mix & Match Set (-18% korting) toegevoegd aan winkelwagen!`);
+                    this.toggleCart(true);
+                });
+            }
+
+            paintBundlePreviewCanvases() {
+                const cfg = this.uiState.bundleConfig;
+                const towel = CatalogData.getBySku(cfg.towelSku);
+                const cloth = CatalogData.getBySku(cfg.clothSku);
+                const c1 = document.getElementById('bundle-towel-canvas');
+                const c2 = document.getElementById('bundle-cloth-canvas');
+                if (towel && c1) {
+                    TextileCanvasRenderer.render(c1, {
+                        weave: towel.weave,
+                        hex: CatalogData.getSwatch(cfg.towelColor).hex,
+                        dimensions: '70×70 cm'
+                    });
+                }
+                if (cloth && c2) {
+                    TextileCanvasRenderer.render(c2, {
+                        weave: cloth.weave,
+                        hex: CatalogData.getSwatch(cfg.clothColor).hex,
+                        dimensions: '35×35 cm',
+                        isDishcloth: true
+                    });
+                }
+            }
+
+            /* ------------------------------------------------------------------------
+             * INTERACTIVE SIZE COMPARISON VISUALIZER (70×70 CM vs 50×65 CM)
+             * ------------------------------------------------------------------------ */
+            renderSizeVisualizer() {
+                const mount = document.getElementById('size-visualizer-mount');
+                if (!mount) return;
+
+                const count = this.uiState.sizeSelectedTowelCount;
+                const area70 = 4900 * count;
+                const areaStd = 3250 * count;
+                const diffArea = area70 - areaStd;
+                const extraWaterMl = Math.round((diffArea * 0.048) * 10) / 10; // ~235ml extra absorption capacity per 4 towels
+
+                mount.innerHTML = `
+                    <div class="grid lg:grid-cols-12 gap-12 items-center">
+                        <!-- Left Proportional Interactive Diagram -->
+                        <div class="lg:col-span-6 bg-alabaster-50 rounded-3xl p-6 sm:p-8 border border-alabaster-200">
+                            <div class="flex items-center justify-between gap-2 mb-6">
+                                <div>
+                                    <span class="text-xs font-bold uppercase tracking-wider text-forest-600">Oppervlakte-Visualizer</span>
+                                    <h3 class="font-display font-bold text-xl text-ink-900">70×70 cm vs. Standaard 50×65 cm</h3>
+                                </div>
+                                <span class="px-3 py-1 rounded-full bg-forest-100 text-forest-700 text-xs font-extrabold">+50,8% groter</span>
+                            </div>
+
+                            <!-- Exact Scale Square: 70x70 outer (100% x 100%) vs 50x65 inner (71.4% width x 92.8% height) -->
+                            <div class="relative aspect-square max-w-sm mx-auto rounded-2xl bg-forest-600 p-5 text-white shadow-inner flex flex-col justify-between overflow-hidden">
+                                <div class="flex justify-between items-center text-xs font-semibold z-10">
+                                    <span class="bg-ink-900/80 px-2.5 py-1 rounded-lg">NOORDWEEF 70 × 70 cm (4.900 cm²)</span>
+                                    <span>70 cm →</span>
+                                </div>
+
+                                <!-- Proportional 50x65 Standard Towel Overlay -->
+                                <div style="width: 71.4%; height: 84%;" class="rounded-xl bg-alabaster-100 text-ink-900 border-2 border-dashed border-ink-900/40 p-4 flex flex-col justify-between shadow-lg">
+                                    <div>
+                                        <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">Standaard Keukendoek</span>
+                                        <strong class="text-sm font-display font-bold">50 × 65 cm (3.250 cm²)</strong>
+                                    </div>
+                                    <p class="text-xs text-zinc-600 leading-snug">
+                                        Mist <strong>1.650 cm²</strong> katoen per doek — raakt veel sneller verzadigd tijdens het afdrogen van grote pannen of schalen.
+                                    </p>
+                                </div>
+
+                                <div class="text-right text-xs font-semibold text-alabaster-100">
+                                    +1.650 cm² extra droogzone per doek
+                                </div>
+                            </div>
+
+                            <!-- Interactive Household Towel Calculator Slider -->
+                            <div class="mt-6 pt-5 border-t border-alabaster-200">
+                                <div class="flex justify-between text-xs font-semibold mb-2">
+                                    <span class="text-zinc-600">Bereken voordeel voor jouw keukenlade:</span>
+                                    <span class="text-forest-700 font-bold">${count} handdoeken</span>
+                                </div>
+                                <input id="towel-calc-slider" type="range" min="1" max="24" value="${count}" class="w-full accent-forest-600 cursor-pointer">
+                                <div class="grid grid-cols-2 gap-3 mt-3 text-center">
+                                    <div class="bg-white p-3 rounded-xl border border-alabaster-200">
+                                        <span class="text-[11px] text-zinc-500 block">Extra katoenoppervlak</span>
+                                        <strong class="font-display font-bold text-base text-ink-900">+${diffArea.toLocaleString('nl-NL')} cm²</strong>
+                                    </div>
+                                    <div class="bg-white p-3 rounded-xl border border-alabaster-200">
+                                        <span class="text-[11px] text-zinc-500 block">Extra vochtopname</span>
+                                        <strong class="font-display font-bold text-base text-forest-700">+${Math.round(extraWaterMl)} ml water</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Craftsmanship & Horeca Specs -->
+                        <div class="lg:col-span-6 space-y-6">
+                            <span class="text-xs font-bold uppercase tracking-widest text-forest-600">Waarom Vierkant 70×70 cm?</span>
+                            <h2 class="font-display font-extrabold text-3xl sm:text-4xl text-ink-900 leading-tight">
+                                Vierkant vouwt strakker, droogt sneller en gaat jaren langer mee.
+                            </h2>
+                            <p class="text-zinc-600 leading-relaxed">
+                                In professionele keukens is 70×70 cm al decennia de gouden standaard. Doordat alle zijden exact gelijk zijn, vouw je de doek moeiteloos in vieren of achten voor een dikke, hittebestendige greep bij hete ovenschalen en gietijzeren pannen.
+                            </p>
+
+                            <div class="grid sm:grid-cols-2 gap-4 pt-2">
+                                <div class="p-5 rounded-2xl bg-alabaster-50 border border-alabaster-200">
+                                    <h4 class="font-display font-bold text-base text-ink-900">Viervoudig gestikte ophanglus</h4>
+                                    <p class="text-xs text-zinc-600 mt-1.5 leading-relaxed">Geplaatst middenin de bovenzoom of op de hoek, verankerd met trekvast keperband dat nooit uitscheurt.</p>
+                                </div>
+                                <div class="p-5 rounded-2xl bg-alabaster-50 border border-alabaster-200">
+                                    <h4 class="font-display font-bold text-base text-ink-900">Indanthreen Kleurvast</h4>
+                                    <p class="text-xs text-zinc-600 mt-1.5 leading-relaxed">Zelfs Antraciet, Saliegroen en Oceaanblauw behouden hun diepe tint na talloze 60°C–90°C wasbeurten.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('towel-calc-slider').addEventListener('input', (e) => {
+                    this.uiState.sizeSelectedTowelCount = parseInt(e.target.value, 10);
+                    this.renderSizeVisualizer();
+                });
+            }
+
+            /* ------------------------------------------------------------------------
+             * PRODUCT DETAIL MODAL WITH INTERACTIVE MACRO-ZOOM LOUPE
+             * ------------------------------------------------------------------------ */
+            openDetailModal(sku) {
+                this.uiState.detailModalSku = sku;
+                this.renderDetailModal();
+                const backdrop = document.getElementById('detail-modal-backdrop');
+                backdrop.classList.remove('hidden');
+                backdrop.classList.add('flex');
+            }
+
+            closeDetailModal() {
+                this.uiState.detailModalSku = null;
+                const backdrop = document.getElementById('detail-modal-backdrop');
+                backdrop.classList.add('hidden');
+                backdrop.classList.remove('flex');
+            }
+
+            renderDetailModal() {
+                const sku = this.uiState.detailModalSku;
+                const product = CatalogData.getBySku(sku);
+                const panel = document.getElementById('detail-modal-panel');
+                if (!product || !panel) return;
+
+                const colorKey = this.uiState.cardColor[sku];
+                const swatch = CatalogData.getSwatch(colorKey);
+                const weave = CatalogData.getWeave(product.weave);
+                const selectedQty = this.uiState.cardTierQty[sku];
+                const disc = CatalogData.getDiscountForUnits(selectedQty, product.isPrebuiltBundle);
+                const unitIncl = product.basePriceIncl * (1 - disc);
+                const totalIncl = unitIncl * selectedQty;
+
+                const tiers = product.isPrebuiltBundle
+                    ? [
+                        { qty: 1, label: '1 Set', discount: 0 },
+                        { qty: 2, label: '2 Sets (-10%)', discount: 0.10 },
+                        { qty: 4, label: '4 Sets (-15%)', discount: 0.15 }
+                    ]
+                    : VOLUME_TIERS;
+
+                panel.innerHTML = `
+                    <div class="p-6 sm:p-8">
+                        <div class="flex items-center justify-between pb-4 mb-6 border-b border-alabaster-200">
+                            <span class="text-xs font-bold uppercase tracking-wider text-forest-600">SKU: ${product.sku} • ${weave.label}</span>
+                            <button id="close-detail-btn" type="button" class="p-2 rounded-xl bg-alabaster-100 hover:bg-alabaster-200 text-ink-900">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            </button>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-8 items-start">
+                            <!-- Left Interactive Macro-Zoom Canvas -->
+                            <div class="space-y-3">
+                                <div class="relative rounded-2xl overflow-hidden border border-alabaster-200">
+                                    <canvas id="detail-modal-canvas" class="w-full h-72 block"></canvas>
+                                    <button id="detail-loupe-pin-btn" type="button" class="absolute top-3 right-3 bg-white/95 text-ink-900 text-xs font-semibold px-3 py-1.5 rounded-xl shadow-sm border border-alabaster-200">
+                                        🔍 Loep: ${this.uiState.detailModalLoupePinned ? 'Actief' : 'Hover'}
+                                    </button>
+                                </div>
+                                <p class="text-xs text-zinc-500 text-center">Beweeg je cursor of vinger over het doek om de weefstructuur en stiknaad 2.6× te vergroten.</p>
+
+                                <div class="grid grid-cols-3 gap-2 text-center pt-1">
+                                    <div class="bg-alabaster-50 p-3 rounded-xl border border-alabaster-200">
+                                        <span class="text-[11px] text-zinc-500 block">Maatvoering</span>
+                                        <strong class="text-xs font-bold text-ink-900">${product.dimensions}</strong>
+                                    </div>
+                                    <div class="bg-alabaster-50 p-3 rounded-xl border border-alabaster-200">
+                                        <span class="text-[11px] text-zinc-500 block">Stofgewicht</span>
+                                        <strong class="text-xs font-bold text-ink-900">${product.gsm} g/m²</strong>
+                                    </div>
+                                    <div class="bg-alabaster-50 p-3 rounded-xl border border-alabaster-200">
+                                        <span class="text-[11px] text-zinc-500 block">Wasadvies</span>
+                                        <strong class="text-xs font-bold text-ink-900">${weave.wash}</strong>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Product Specs & Volume Calculator -->
+                            <div class="space-y-5">
+                                <div>
+                                    <h3 class="font-display font-extrabold text-2xl text-ink-900">${product.name}</h3>
+                                    <p class="text-xs text-amber-600 font-semibold mt-1">★★★★★ ${product.rating.toFixed(1)} (${product.reviews} geverifieerde beoordelingen)</p>
+                                    <p class="text-sm text-zinc-600 mt-3 leading-relaxed">${product.description}</p>
+                                </div>
+
+                                <!-- Swatches -->
+                                <div>
+                                    <span class="text-xs font-semibold text-ink-900 block mb-2">Gekozen tint: <span class="text-forest-600">${swatch.name}</span></span>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${product.colors.map(cKey => {
+                                            const s = CatalogData.getSwatch(cKey);
+                                            const active = cKey === colorKey;
+                                            return `
+                                                <button type="button" data-modal-color="${cKey}" class="flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-semibold transition ${active ? 'border-ink-900 bg-alabaster-100' : 'border-alabaster-200 hover:bg-alabaster-50'}">
+                                                    <span style="background-color:${s.hex}" class="w-4 h-4 rounded-full border border-black/15"></span>
+                                                    ${s.name}
+                                                </button>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+
+                                <!-- Staffelkorting Grid -->
+                                <div>
+                                    <span class="text-xs font-semibold text-ink-900 block mb-2">Kies jouw aantal (Staffelkorting):</span>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        ${tiers.map(t => {
+                                            const tUnit = product.basePriceIncl * (1 - t.discount);
+                                            const active = t.qty === selectedQty;
+                                            return `
+                                                <button type="button" data-modal-tier="${t.qty}" class="p-3 rounded-xl border-2 text-left transition ${active ? 'border-forest-600 bg-forest-50' : 'border-alabaster-200 hover:border-alabaster-300'}">
+                                                    <span class="text-xs font-bold text-ink-900 block">${t.label}</span>
+                                                    <span class="text-[11px] text-zinc-600">${this.store.formatMoney(tUnit)} per stuk</span>
+                                                </button>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-alabaster-200 flex items-center justify-between gap-4">
+                                    <div>
+                                        <span class="font-display font-extrabold text-2xl text-ink-900">${this.store.formatMoney(totalIncl)}</span>
+                                        <span class="block text-xs text-zinc-500">${this.store.state.vatIncl ? 'Inclusief 21% BTW' : 'Exclusief 21% BTW'}</span>
+                                    </div>
+                                    <button id="modal-add-cart-btn" type="button" class="flex-1 py-4 px-5 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-sm shadow-lg transition">
+                                        ${selectedQty}× Toevoegen aan winkelwagen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const modalCanvas = document.getElementById('detail-modal-canvas');
+                modalCanvas.dataset.loupePinned = String(this.uiState.detailModalLoupePinned);
+                TextileCanvasRenderer.attachInteractiveLoupe(modalCanvas, () => ({
+                    weave: product.weave,
+                    hex: CatalogData.getSwatch(this.uiState.cardColor[sku]).hex,
+                    dimensions: product.category === 'bundels' ? '70×70 SET' : product.dimensions,
+                    isDishcloth: product.category === 'vaatdoeken',
+                    isBundle: product.category === 'bundels'
+                }));
+                this.paintDetailModalCanvas();
+
+                document.getElementById('close-detail-btn').addEventListener('click', () => this.closeDetailModal());
+                document.getElementById('detail-loupe-pin-btn').addEventListener('click', () => {
+                    this.uiState.detailModalLoupePinned = !this.uiState.detailModalLoupePinned;
+                    this.renderDetailModal();
+                });
+
+                panel.querySelectorAll('[data-modal-color]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.uiState.cardColor[sku] = btn.dataset.modalColor;
+                        this.renderCatalogGrid();
+                        this.renderDetailModal();
+                    });
+                });
+
+                panel.querySelectorAll('[data-modal-tier]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.uiState.cardTierQty[sku] = parseInt(btn.dataset.modalTier, 10);
+                        this.renderCatalogGrid();
+                        this.renderDetailModal();
+                    });
+                });
+
+                document.getElementById('modal-add-cart-btn').addEventListener('click', () => {
+                    this.store.addStandardItem(sku, colorKey, selectedQty);
+                    this.closeDetailModal();
+                    this.showToast(`${selectedQty}× ${product.name} toegevoegd aan winkelwagen.`);
+                    this.toggleCart(true);
+                });
+            }
+
+            paintDetailModalCanvas() {
+                const sku = this.uiState.detailModalSku;
+                const product = CatalogData.getBySku(sku);
+                const canvas = document.getElementById('detail-modal-canvas');
+                if (!product || !canvas) return;
+                const rect = canvas.getBoundingClientRect();
+                TextileCanvasRenderer.render(canvas, {
+                    weave: product.weave,
+                    hex: CatalogData.getSwatch(this.uiState.cardColor[sku]).hex,
+                    dimensions: product.category === 'bundels' ? '70×70 SET' : product.dimensions,
+                    isDishcloth: product.category === 'vaatdoeken',
+                    isBundle: product.category === 'bundels',
+                    loupe: this.uiState.detailModalLoupePinned ? { x: rect.width * 0.62, y: rect.height * 0.48 } : null
+                });
+            }
+
+            /* ------------------------------------------------------------------------
+             * PERSISTENT SLIDE-OVER WINKELWAGEN DRAWER
+             * ------------------------------------------------------------------------ */
+            toggleCart(open) {
+                this.uiState.cartOpen = open;
+                const drawer = document.getElementById('cart-drawer');
+                const backdrop = document.getElementById('cart-backdrop');
+                if (open) {
+                    backdrop.classList.remove('hidden');
+                    drawer.classList.remove('translate-x-full');
+                    this.renderCartDrawerContents();
+                } else {
+                    backdrop.classList.add('hidden');
+                    drawer.classList.add('translate-x-full');
+                }
+            }
+
+            renderCartDrawerContents() {
+                const drawer = document.getElementById('cart-drawer');
+                if (!drawer) return;
+
+                const sum = this.store.getSummary();
+                const pct = Math.min(100, Math.round((sum.afterPromoIncl / sum.freeShippingThresholdIncl) * 100));
+                const remainingFree = Math.max(0, sum.freeShippingThresholdIncl - sum.afterPromoIncl);
+
+                drawer.innerHTML = `
+                    <!-- Header -->
+                    <div class="p-5 bg-white border-b border-alabaster-200 flex items-center justify-between">
+                        <div>
+                            <h3 class="font-display font-bold text-lg text-ink-900">Winkelwagen (${sum.badgeCount})</h3>
+                            <p class="text-xs text-zinc-500">${this.store.state.vatIncl ? 'Prijzen incl. 21% BTW' : 'Zakelijke weergave excl. BTW'}</p>
+                        </div>
+                        <button id="close-cart-btn" type="button" class="p-2 rounded-xl bg-alabaster-100 hover:bg-alabaster-200 text-ink-900">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
+
+                    <!-- Free Shipping Progress Bar (€50) -->
+                    <div class="px-5 py-3 bg-forest-50 border-b border-forest-100">
+                        <div class="flex justify-between text-xs font-medium text-forest-800 mb-1.5">
+                            <span>${remainingFree === 0 && sum.afterPromoIncl > 0 ? '✓ Gratis verzending geactiveerd!' : `Nog €${remainingFree.toFixed(2).replace('.', ',')} voor gratis verzending`}</span>
+                            <span class="font-bold">${pct}%</span>
+                        </div>
+                        <div class="w-full h-2 rounded-full bg-forest-100 overflow-hidden">
+                            <div class="h-full bg-forest-600 rounded-full transition-all duration-300" style="width:${pct}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Items List -->
+                    <div class="flex-1 overflow-y-auto p-5 space-y-3">
+                        ${sum.detailedItems.length === 0 ? `
+                            <div class="text-center py-16 space-y-3">
+                                <p class="font-display font-bold text-base text-ink-900">Je winkelwagen is momenteel leeg</p>
+                                <p class="text-xs text-zinc-500">Voeg een 70×70 cm handdoek of Mix & Match bundel toe.</p>
+                            </div>
+                        ` : sum.detailedItems.map((item, idx) => `
+                            <div class="bg-white p-3.5 rounded-2xl border border-alabaster-200 space-y-2.5">
+                                <div class="flex gap-3 items-center">
+                                    <canvas id="cart-mini-canvas-${idx}" class="w-16 h-16 rounded-xl border border-alabaster-200 shrink-0 block"></canvas>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-start justify-between gap-2">
+                                            <h4 class="font-display font-bold text-xs text-ink-900 leading-snug">${item.title}</h4>
+                                            <button type="button" data-remove-cart="${item.id}" aria-label="Verwijder" class="text-zinc-400 hover:text-red-600 text-xs">✕</button>
+                                        </div>
+                                        <p class="text-[11px] text-zinc-500 mt-0.5">${item.subtitle}</p>
+                                        ${item.discountPct > 0 ? `<span class="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700">Staffel -${item.discountPct}% actief</span>` : ''}
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center justify-between pt-2 border-t border-alabaster-100">
+                                    <div class="inline-flex items-center rounded-xl border border-alabaster-200 bg-alabaster-50">
+                                        <button type="button" data-qty-delta="-1" data-cart-id="${item.id}" class="px-2.5 py-1 text-xs font-bold hover:bg-alabaster-200 rounded-l-xl">−</button>
+                                        <span class="px-3 text-xs font-bold text-ink-900">${item.units}</span>
+                                        <button type="button" data-qty-delta="1" data-cart-id="${item.id}" class="px-2.5 py-1 text-xs font-bold hover:bg-alabaster-200 rounded-r-xl">+</button>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="font-display font-bold text-sm text-ink-900">${this.store.formatMoney(item.lineIncl)}</span>
+                                        <span class="block text-[10px] text-zinc-400">${this.store.formatMoney(item.effectiveUnitIncl)} p/st</span>
+                                    </div>
+                                </div>
+
+                                ${item.nextHint ? `
+                                    <div class="flex items-center justify-between bg-alabaster-50 px-2.5 py-1.5 rounded-lg text-[11px] text-zinc-600">
+                                        <span>Voeg nog <strong>${item.nextHint.needed}</strong> toe voor <strong>-${item.nextHint.pct}%</strong> korting</span>
+                                        <button type="button" data-upgrade-id="${item.id}" data-upgrade-add="${item.nextHint.needed}" class="font-bold text-forest-600 hover:underline">+${item.nextHint.needed} toevoegen</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Footer Totals & Promo -->
+                    <div class="p-5 bg-white border-t border-alabaster-200 space-y-3.5">
+                        <div>
+                            <div class="flex gap-2">
+                                <input id="cart-promo-input" type="text" value="${sum.activeCode}" placeholder="Kortingscode (WELKOM10 / ZAKELIJK15)" class="flex-1 px-3 py-2 rounded-xl bg-alabaster-50 border border-alabaster-200 text-xs uppercase focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <button id="cart-promo-btn" type="button" class="px-3.5 py-2 rounded-xl bg-alabaster-200 hover:bg-alabaster-300 text-ink-900 text-xs font-bold transition">Toepassen</button>
+                            </div>
+                            <p id="cart-promo-msg" class="text-[11px] mt-1 ${sum.activeCode ? 'text-emerald-700 font-semibold' : 'hidden'}">
+                                ${sum.activeCode ? `✓ Actieve code: ${sum.activeCode}` : ''}
+                            </p>
+                        </div>
+
+                        <div class="space-y-1.5 text-xs border-t border-alabaster-100 pt-3">
+                            ${sum.totalSavingsTierIncl > 0.01 ? `
+                                <div class="flex justify-between text-emerald-700 font-semibold">
+                                    <span>Uw bundel- & staffelvoordeel</span>
+                                    <span>-${this.store.formatMoney(sum.totalSavingsTierIncl)}</span>
+                                </div>
+                            ` : ''}
+                            <div class="flex justify-between text-zinc-600">
+                                <span>Subtotaal (excl. 21% BTW)</span>
+                                <span>${this.store.formatMoney(sum.subtotalIncl, false)}</span>
+                            </div>
+                            ${sum.promoDiscountIncl > 0 ? `
+                                <div class="flex justify-between text-emerald-700 font-semibold">
+                                    <span>Kortingscode (${sum.activeCode})</span>
+                                    <span>-${this.store.formatMoney(sum.promoDiscountIncl)}</span>
+                                </div>
+                            ` : ''}
+                            <div class="flex justify-between text-zinc-600">
+                                <span>Verzending</span>
+                                <span>${sum.shippingIncl === 0 ? 'Gratis' : this.store.formatMoney(sum.shippingIncl)}</span>
+                            </div>
+                            <div class="flex justify-between text-zinc-600">
+                                <span>BTW (21%)</span>
+                                <span>€${sum.vatAmount.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <div class="flex justify-between font-display font-extrabold text-base text-ink-900 pt-2 border-t border-alabaster-200">
+                                <span>Totaal (incl. BTW)</span>
+                                <span>€${sum.grandTotalIncl.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                        </div>
+
+                        <button id="proceed-checkout-btn" type="button" ${sum.detailedItems.length === 0 ? 'disabled' : ''} class="w-full py-4 rounded-2xl bg-forest-600 hover:bg-forest-700 disabled:opacity-40 text-white font-semibold text-sm shadow-lg transition">
+                            Naar Veilig Afrekenen →
+                        </button>
+                    </div>
+                `;
+
+                // Paint mini canvases inside cart
+                sum.detailedItems.forEach((item, idx) => {
+                    const miniCanvas = document.getElementById(`cart-mini-canvas-${idx}`);
+                    if (miniCanvas) {
+                        TextileCanvasRenderer.render(miniCanvas, {
+                            weave: item.weave || 'waffle',
+                            hex: CatalogData.getSwatch(item.colorKey).hex,
+                            dimensions: '70×70',
+                            isDishcloth: item.product && item.product.category === 'vaatdoeken'
+                        });
+                    }
+                });
+
+                document.getElementById('close-cart-btn').addEventListener('click', () => this.toggleCart(false));
+
+                drawer.querySelectorAll('[data-qty-delta]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.store.updateItemUnits(btn.dataset.cartId, parseInt(btn.dataset.qtyDelta, 10));
+                    });
+                });
+
+                drawer.querySelectorAll('[data-upgrade-id]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const add = parseInt(btn.dataset.upgradeAdd, 10);
+                        this.store.updateItemUnits(btn.dataset.upgradeId, add);
+                        this.showToast(`Staffelkorting automatisch geactiveerd!`);
+                    });
+                });
+
+                drawer.querySelectorAll('[data-remove-cart]').forEach(btn => {
+                    btn.addEventListener('click', () => this.store.removeItem(btn.dataset.removeCart));
+                });
+
+                document.getElementById('cart-promo-btn').addEventListener('click', () => {
+                    const val = document.getElementById('cart-promo-input').value;
+                    const res = this.store.applyPromo(val);
+                    const msgEl = document.getElementById('cart-promo-msg');
+                    if (msgEl) {
+                        msgEl.textContent = res.message;
+                        msgEl.className = `text-[11px] mt-1 font-semibold ${res.ok ? 'text-emerald-700' : 'text-red-600'}`;
+                    }
+                });
+
+                document.getElementById('proceed-checkout-btn').addEventListener('click', () => {
+                    this.toggleCart(false);
+                    this.openCheckoutModal();
+                });
+            }
+
+            /* ------------------------------------------------------------------------
+             * INTERACTIVE CHECKOUT MODAL + PRINTABLE / DOWNLOADABLE JS FACTUUR
+             * ------------------------------------------------------------------------ */
+            openCheckoutModal() {
+                this.uiState.checkoutOpen = true;
+                this.uiState.completedOrder = null;
+                if (!this.store.state.vatIncl) {
+                    this.uiState.checkoutData.customerType = 'zakelijk';
+                }
+                this.renderCheckoutModal();
+                const backdrop = document.getElementById('checkout-backdrop');
+                backdrop.classList.remove('hidden');
+                backdrop.classList.add('flex');
+            }
+
+            closeCheckoutModal() {
+                this.uiState.checkoutOpen = false;
+                const backdrop = document.getElementById('checkout-backdrop');
+                backdrop.classList.add('hidden');
+                backdrop.classList.remove('flex');
+            }
+
+            renderCheckoutModal() {
+                const panel = document.getElementById('checkout-panel');
+                if (!panel) return;
+
+                if (this.uiState.completedOrder) {
+                    this.renderOrderConfirmationView(panel);
+                    return;
+                }
+
+                const d = this.uiState.checkoutData;
+                const err = d.errors || {};
+                const sum = this.store.getSummary();
+                const carrierExtraIncl = d.carrier === 'dhl-b2b' ? 1.50 : 0;
+                const finalIncl = sum.grandTotalIncl + carrierExtraIncl;
+
+                panel.innerHTML = `
+                    <div class="p-6 sm:p-8 space-y-6">
+                        <div class="flex items-center justify-between pb-4 border-b border-alabaster-200">
+                            <div>
+                                <span class="text-xs font-bold uppercase tracking-wider text-forest-600">NOORDWEEF® Veilige Checkout</span>
+                                <h3 class="font-display font-extrabold text-2xl text-ink-900">Bestelling Afronden</h3>
+                            </div>
+                            <button id="close-co-btn" type="button" class="p-2 rounded-xl bg-alabaster-100 hover:bg-alabaster-200 text-ink-900">✕</button>
+                        </div>
+
+                        <!-- Particulier vs Zakelijk -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <button type="button" data-co-type="particulier" class="p-3 rounded-xl border-2 text-sm font-bold transition ${d.customerType === 'particulier' ? 'border-forest-600 bg-forest-50 text-forest-800' : 'border-alabaster-200 text-ink-800'}">
+                                Particulier
+                            </button>
+                            <button type="button" data-co-type="zakelijk" class="p-3 rounded-xl border-2 text-sm font-bold transition ${d.customerType === 'zakelijk' ? 'border-forest-600 bg-forest-50 text-forest-800' : 'border-alabaster-200 text-ink-800'}">
+                                Zakelijk / Horeca (B2B)
+                            </button>
+                        </div>
+
+                        ${d.customerType === 'zakelijk' || d.paymentMethod === 'factuur' ? `
+                            <div class="grid sm:grid-cols-2 gap-4 bg-alabaster-50 p-4 rounded-2xl border border-alabaster-200">
+                                <div>
+                                    <label class="block text-xs font-semibold text-ink-900 mb-1">Bedrijfsnaam *</label>
+                                    <input id="co-company" type="text" value="${d.companyName}" placeholder="Bistro Noord B.V." class="w-full px-3.5 py-2.5 rounded-xl bg-white border ${err.companyName ? 'border-red-500' : 'border-alabaster-200'} text-sm">
+                                    ${err.companyName ? `<p class="text-[11px] text-red-600 mt-1">${err.companyName}</p>` : ''}
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-ink-900 mb-1">KvK-nummer (8 cijfers) *</label>
+                                    <input id="co-kvk" type="text" value="${d.kvkNumber}" placeholder="84920134" class="w-full px-3.5 py-2.5 rounded-xl bg-white border ${err.kvkNumber ? 'border-red-500' : 'border-alabaster-200'} text-sm">
+                                    ${err.kvkNumber ? `<p class="text-[11px] text-red-600 mt-1">${err.kvkNumber}</p>` : ''}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        <!-- Address Details -->
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-ink-900 mb-1">Volledige naam *</label>
+                                <input id="co-name" type="text" value="${d.fullName}" placeholder="Sanne van der Berg" class="w-full px-3.5 py-2.5 rounded-xl bg-alabaster-50 border ${err.fullName ? 'border-red-500' : 'border-alabaster-200'} text-sm">
+                                ${err.fullName ? `<p class="text-[11px] text-red-600 mt-1">${err.fullName}</p>` : ''}
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-ink-900 mb-1">E-mailadres voor factuur *</label>
+                                <input id="co-email" type="email" value="${d.email}" placeholder="sanne@voorbeeld.nl" class="w-full px-3.5 py-2.5 rounded-xl bg-alabaster-50 border ${err.email ? 'border-red-500' : 'border-alabaster-200'} text-sm">
+                                ${err.email ? `<p class="text-[11px] text-red-600 mt-1">${err.email}</p>` : ''}
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-xs font-semibold text-ink-900 mb-1">Postcode *</label>
+                                    <input id="co-postal" type="text" value="${d.postalCode}" placeholder="1015 CJ" class="w-full px-3.5 py-2.5 rounded-xl bg-alabaster-50 border ${err.postalCode ? 'border-red-500' : 'border-alabaster-200'} text-sm uppercase">
+                                    ${err.postalCode ? `<p class="text-[11px] text-red-600 mt-1">${err.postalCode}</p>` : ''}
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-ink-900 mb-1">Huisnr. *</label>
+                                    <input id="co-house" type="text" value="${d.houseNumber}" placeholder="24-A" class="w-full px-3.5 py-2.5 rounded-xl bg-alabaster-50 border ${err.houseNumber ? 'border-red-500' : 'border-alabaster-200'} text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-ink-900 mb-1">Straat & Woonplaats *</label>
+                                <input id="co-city" type="text" value="${d.streetCity}" placeholder="Prinsengracht, Amsterdam" class="w-full px-3.5 py-2.5 rounded-xl bg-alabaster-50 border ${err.streetCity ? 'border-red-500' : 'border-alabaster-200'} text-sm">
+                                ${err.streetCity ? `<p class="text-[11px] text-red-600 mt-1">${err.streetCity}</p>` : ''}
+                            </div>
+                        </div>
+
+                        <!-- Delivery Carrier -->
+                        <div>
+                            <span class="block text-xs font-bold uppercase tracking-wider text-ink-900 mb-2">Bezorgmethode</span>
+                            <div class="grid sm:grid-cols-2 gap-3">
+                                <button type="button" data-co-carrier="postnl" class="p-3.5 rounded-xl border-2 text-left transition ${d.carrier === 'postnl' ? 'border-forest-600 bg-forest-50' : 'border-alabaster-200'}">
+                                    <span class="font-bold text-sm text-ink-900 block">PostNL Pakketservice</span>
+                                    <span class="text-xs text-zinc-500">Morgen in huis (${sum.shippingIncl === 0 ? 'Gratis' : '€5,95'})</span>
+                                </button>
+                                <button type="button" data-co-carrier="dhl-b2b" class="p-3.5 rounded-xl border-2 text-left transition ${d.carrier === 'dhl-b2b' ? 'border-forest-600 bg-forest-50' : 'border-alabaster-200'}">
+                                    <span class="font-bold text-sm text-ink-900 block">DHL Zakelijk Tijdvak</span>
+                                    <span class="text-xs text-zinc-500">Levering vóór 11:00 uur (+€1,50)</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div>
+                            <span class="block text-xs font-bold uppercase tracking-wider text-ink-900 mb-2">Betaalmethode</span>
+                            <div class="grid sm:grid-cols-3 gap-3">
+                                <button type="button" data-co-pay="ideal" class="p-3.5 rounded-xl border-2 text-left transition ${d.paymentMethod === 'ideal' ? 'border-forest-600 bg-forest-50' : 'border-alabaster-200'}">
+                                    <span class="font-bold text-sm text-ink-900 block">iDEAL</span>
+                                    <span class="text-xs text-zinc-500">Nederlandse banken</span>
+                                </button>
+                                <button type="button" data-co-pay="bancontact" class="p-3.5 rounded-xl border-2 text-left transition ${d.paymentMethod === 'bancontact' ? 'border-forest-600 bg-forest-50' : 'border-alabaster-200'}">
+                                    <span class="font-bold text-sm text-ink-900 block">Bancontact</span>
+                                    <span class="text-xs text-zinc-500">Direct voor België</span>
+                                </button>
+                                <button type="button" data-co-pay="factuur" class="p-3.5 rounded-xl border-2 text-left transition ${d.paymentMethod === 'factuur' ? 'border-forest-600 bg-forest-50' : 'border-alabaster-200'}">
+                                    <span class="font-bold text-sm text-ink-900 block">Op Factuur (14 dgn)</span>
+                                    <span class="text-xs text-zinc-500">Met KvK-nummer</span>
+                                </button>
+                            </div>
+
+                            ${d.paymentMethod === 'ideal' ? `
+                                <div class="mt-3">
+                                    <label class="block text-xs font-semibold text-ink-900 mb-1">Selecteer je iDEAL-bank</label>
+                                    <select id="co-ideal-bank" class="w-full px-3.5 py-2.5 rounded-xl bg-alabaster-50 border border-alabaster-200 text-sm font-medium">
+                                        ${['ING', 'Rabobank', 'ABN AMRO', 'Bunq', 'ASN Bank'].map(bank => `
+                                            <option value="${bank}" ${d.idealBank === bank ? 'selected' : ''}>${bank}</option>
+                                        `).join('')}
+                                    </select>
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        <!-- Final Bar -->
+                        <div class="bg-alabaster-100 p-4 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <span class="text-xs text-zinc-600 block">Totaal te voldoen (incl. 21% BTW)</span>
+                                <span class="font-display font-extrabold text-2xl text-ink-900">€${finalIncl.toFixed(2).replace('.', ',')}</span>
+                            </div>
+                            <button id="submit-order-btn" type="button" class="px-8 py-4 rounded-2xl bg-forest-600 hover:bg-forest-700 text-white font-semibold text-sm sm:text-base shadow-lg transition">
+                                Bestelling Definitief Plaatsen
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                this.bindCheckoutFormEvents(finalIncl, carrierExtraIncl);
+            }
+
+            syncCheckoutInputs() {
+                const d = this.uiState.checkoutData;
+                const val = (id) => {
+                    const el = document.getElementById(id);
+                    return el ? el.value : null;
+                };
+                if (val('co-company') !== null) d.companyName = val('co-company');
+                if (val('co-kvk') !== null) d.kvkNumber = val('co-kvk');
+                if (val('co-name') !== null) d.fullName = val('co-name');
+                if (val('co-email') !== null) d.email = val('co-email');
+                if (val('co-postal') !== null) d.postalCode = val('co-postal');
+                if (val('co-house') !== null) d.houseNumber = val('co-house');
+                if (val('co-city') !== null) d.streetCity = val('co-city');
+                if (val('co-ideal-bank') !== null) d.idealBank = val('co-ideal-bank');
+            }
+
+            bindCheckoutFormEvents(finalIncl, carrierExtraIncl) {
+                const panel = document.getElementById('checkout-panel');
+                const d = this.uiState.checkoutData;
+
+                document.getElementById('close-co-btn').addEventListener('click', () => this.closeCheckoutModal());
+
+                panel.querySelectorAll('[data-co-type]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.syncCheckoutInputs();
+                        d.customerType = btn.dataset.coType;
+                        this.renderCheckoutModal();
+                    });
+                });
+
+                panel.querySelectorAll('[data-co-carrier]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.syncCheckoutInputs();
+                        d.carrier = btn.dataset.coCarrier;
+                        this.renderCheckoutModal();
+                    });
+                });
+
+                panel.querySelectorAll('[data-co-pay]').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        this.syncCheckoutInputs();
+                        d.paymentMethod = btn.dataset.coPay;
+                        if (d.paymentMethod === 'factuur') d.customerType = 'zakelijk';
+                        this.renderCheckoutModal();
+                    });
+                });
+
+                document.getElementById('submit-order-btn').addEventListener('click', () => {
+                    this.syncCheckoutInputs();
+                    const errors = {};
+
+                    if (d.fullName.trim().length < 3) errors.fullName = 'Vul je voor- en achternaam in.';
+                    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email.trim())) errors.email = 'Vul een geldig e-mailadres in.';
+                    if (d.postalCode.trim().length < 4) errors.postalCode = 'Vul een geldige postcode in.';
+                    if (!d.houseNumber.trim()) errors.postalCode = 'Vul ook een huisnummer in.';
+                    if (d.streetCity.trim().length < 3) errors.streetCity = 'Vul straat en woonplaats in.';
+
+                    if (d.customerType === 'zakelijk' || d.paymentMethod === 'factuur') {
+                        if (d.companyName.trim().length < 2) errors.companyName = 'Bedrijfsnaam is verplicht.';
+                        if (!/^\d{8}$/.test(d.kvkNumber.replace(/\s/g, ''))) errors.kvkNumber = 'Vul een geldig KvK-nummer van 8 cijfers in.';
+                    }
+
+                    d.errors = errors;
+                    if (Object.keys(errors).length > 0) {
+                        this.renderCheckoutModal();
+                        return;
+                    }
+
+                    const summary = this.store.getSummary();
+                    const invoiceNum = 'NW-2026-' + Math.floor(10000 + Math.random() * 89999);
+                    const dateStr = new Date().toLocaleDateString('nl-NL', { day: '2-digit', month: 'long', year: 'numeric' });
+
+                    this.uiState.completedOrder = {
+                        invoiceNum,
+                        dateStr,
+                        customer: { ...d },
+                        summary,
+                        carrierExtraIncl,
+                        finalIncl,
+                        finalExcl: finalIncl / 1.21,
+                        finalVat: finalIncl - (finalIncl / 1.21)
+                    };
+
+                    this.store.clearCart();
+                    this.renderCheckoutModal();
+                });
+            }
+
+            renderOrderConfirmationView(panel) {
+                const ord = this.uiState.completedOrder;
+                const payLabel = ord.customer.paymentMethod === 'ideal'
+                    ? `iDEAL (${ord.customer.idealBank})`
+                    : ord.customer.paymentMethod === 'bancontact'
+                        ? 'Bancontact'
+                        : `Op Factuur 14 dagen (KvK: ${ord.customer.kvkNumber})`;
+
+                panel.innerHTML = `
+                    <div class="p-6 sm:p-8 space-y-6">
+                        <div class="text-center space-y-2">
+                            <div class="w-14 h-14 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                            </div>
+                            <span class="text-xs font-bold uppercase tracking-widest text-forest-600">Orderbevestiging & BTW-Factuur</span>
+                            <h3 class="font-display font-extrabold text-2xl sm:text-3xl text-ink-900">Bedankt voor je bestelling!</h3>
+                            <p class="text-sm text-zinc-600">Factuurnummer <strong>${ord.invoiceNum}</strong> is bevestigd voor ${ord.customer.email}.</p>
+                        </div>
+
+                        <!-- Printable Invoice Sheet -->
+                        <div id="printable-invoice-sheet" class="bg-alabaster-50 rounded-2xl p-5 sm:p-6 border border-alabaster-200 text-xs space-y-4">
+                            <div class="flex flex-wrap justify-between gap-4 pb-4 border-b border-alabaster-200">
+                                <div>
+                                    <strong class="font-display text-base text-ink-900 block">NOORDWEEF® Textielatelier B.V.</strong>
+                                    <span class="text-zinc-500">Textielplein 18, 7514 AN Enschede • BTW: NL864611029B01</span>
+                                </div>
+                                <div class="text-right">
+                                    <strong class="text-ink-900 block">Factuur #${ord.invoiceNum}</strong>
+                                    <span class="text-zinc-500">Datum: ${ord.dateStr}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <div>
+                                    <span class="text-zinc-400 uppercase font-bold text-[10px] block">Verzend- & Factuuradres</span>
+                                    ${ord.customer.companyName ? `<strong class="block text-ink-900">${ord.customer.companyName} (KvK ${ord.customer.kvkNumber})</strong>` : ''}
+                                    <span class="block text-ink-900 font-medium">${ord.customer.fullName}</span>
+                                    <span class="block text-zinc-600">${ord.customer.streetCity} ${ord.customer.houseNumber}, ${ord.customer.postalCode}</span>
+                                </div>
+                                <div class="sm:text-right">
+                                    <span class="text-zinc-400 uppercase font-bold text-[10px] block">Levering & Betaling</span>
+                                    <span class="block text-ink-900 font-medium">${ord.customer.carrier === 'dhl-b2b' ? 'DHL Zakelijk Tijdvak' : 'PostNL Pakketservice'}</span>
+                                    <span class="block text-zinc-600">${payLabel}</span>
+                                </div>
+                            </div>
+
+                            <table class="w-full text-left border-t border-b border-alabaster-200">
+                                <thead>
+                                    <tr class="text-zinc-500 border-b border-alabaster-200">
+                                        <th class="py-2">Omschrijving</th>
+                                        <th class="py-2 text-center">Aantal</th>
+                                        <th class="py-2 text-right">Bedrag incl. BTW</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-alabaster-200/70">
+                                    ${ord.summary.detailedItems.map(i => `
+                                        <tr>
+                                            <td class="py-2 font-medium text-ink-900">${i.title} <span class="text-zinc-500 font-normal">(${i.subtitle})</span></td>
+                                            <td class="py-2 text-center">${i.units}</td>
+                                            <td class="py-2 text-right font-semibold">€${i.lineIncl.toFixed(2).replace('.', ',')}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+
+                            <div class="space-y-1 max-w-xs ml-auto">
+                                <div class="flex justify-between text-zinc-600"><span>Totaal excl. BTW:</span><span>€${ord.finalExcl.toFixed(2).replace('.', ',')}</span></div>
+                                <div class="flex justify-between text-zinc-600"><span>21% BTW:</span><span>€${ord.finalVat.toFixed(2).replace('.', ',')}</span></div>
+                                <div class="flex justify-between font-display font-extrabold text-sm text-ink-900 pt-1 border-t border-alabaster-200">
+                                    <span>Totaalbedrag incl. BTW:</span>
+                                    <span>€${ord.finalIncl.toFixed(2).replace('.', ',')}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions: Download HTML Factuur / Print / Close -->
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex flex-wrap gap-2.5">
+                                <button id="download-invoice-btn" type="button" class="px-4 py-2.5 rounded-xl bg-ink-900 hover:bg-forest-700 text-white text-xs font-semibold transition">
+                                    ⬇ Download Factuur (.html)
+                                </button>
+                                <button id="print-invoice-btn" type="button" class="px-4 py-2.5 rounded-xl bg-alabaster-100 hover:bg-alabaster-200 text-ink-900 text-xs font-semibold transition border border-alabaster-200">
+                                    🖨 Factuur Afdrukken
+                                </button>
+                            </div>
+                            <button id="done-order-btn" type="button" class="px-5 py-2.5 rounded-xl bg-forest-600 hover:bg-forest-700 text-white text-xs font-semibold transition">
+                                Terug naar de Webshop
+                            </button>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('print-invoice-btn').addEventListener('click', () => window.print());
+                document.getElementById('download-invoice-btn').addEventListener('click', () => this.downloadInvoiceFile(ord));
+                document.getElementById('done-order-btn').addEventListener('click', () => this.closeCheckoutModal());
+            }
+
+            downloadInvoiceFile(ord) {
+                const sheetHtml = document.getElementById('printable-invoice-sheet').innerHTML;
+                const doc = `<!DOCTYPE html><html lang="nl"><head><meta charset="UTF-8"><title>Factuur ${ord.invoiceNum} - NOORDWEEF</title><style>body{font-family:sans-serif;max-width:760px;margin:40px auto;padding:24px;color:#18181B;line-height:1.5}table{width:100%;border-collapse:collapse;margin:16px 0}th,td{padding:8px;border-bottom:1px solid #ddd;text-align:left}</style></head><body>${sheetHtml}</body></html>`;
+                const blob = new Blob([doc], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Factuur-${ord.invoiceNum}.html`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+                this.showToast(`Factuur ${ord.invoiceNum}.html gedownload.`);
+            }
+
+            /* ------------------------------------------------------------------------
+             * TOAST NOTIFICATIONS (NO ALERT / CONFIRM)
+             * ------------------------------------------------------------------------ */
+            showToast(message) {
+                const stack = document.getElementById('toast-stack');
+                if (!stack) return;
+
+                const el = document.createElement('div');
+                el.className = 'pointer-events-auto bg-ink-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-white/10 text-xs font-medium flex items-center gap-2.5 transition-all duration-300 opacity-0 translate-y-2';
+                el.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span><span>${message}</span>`;
+                stack.appendChild(el);
+
+                requestAnimationFrame(() => {
+                    el.classList.remove('opacity-0', 'translate-y-2');
+                });
+
+                setTimeout(() => {
+                    el.classList.add('opacity-0', 'translate-y-2');
+                    setTimeout(() => el.remove(), 300);
+                }, 3200);
+            }
+        }
+
+        /* ============================================================================
+         * 6. BOOTSTRAP APPLICATION ON WINDOW LOAD
+         * ============================================================================ */
+        window.onload = function () {
+            const store = new CartStore();
+            const appUI = new NoordweefUI(store);
+            appUI.mount();
+        };
+    </script>
+</body>
+</html>
